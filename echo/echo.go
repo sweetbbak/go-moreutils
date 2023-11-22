@@ -1,0 +1,141 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	// flag "github.com/spf13/pflag"
+	"io"
+	"log"
+	"os"
+	"regexp"
+	"strconv"
+	"strings"
+)
+
+var (
+	noNewline                 = flag.Bool("n", false, "suppress newline")
+	help                      = flag.Bool("h", false, "print help message")
+	interpretEscapes          = flag.Bool("e", true, "enable interpretation of backslash escapes (default)")
+	interpretBackslashEscapes = flag.Bool("E", false, "disable interpretation of backslash escapes")
+	specialFormatter          = flag.Bool("f", false, "interpret hex colors {#1e1e1e}")
+)
+
+var usage = `USAGE:
+echo <options> [strings]...
+		-e    interpret escape sequences
+		-n    suppress newlines
+		-E    disable interpretation of backslash sequences
+		-f    use special formatting replacement strings for hex colors "{#1e1e1e}Hello{clear}"	
+`
+
+func escapeStr(s string) (string, error) {
+	if len(s) < 1 {
+		return "", nil
+	}
+
+	s = strings.Split(s, "\\c")[0]
+	s = strings.Replace(s, "\\0", "\\", -1)
+	s = fmt.Sprintf("\"%s\"", s)
+
+	_, err := fmt.Sscanf(s, "%q", &s)
+	if err != nil {
+		return "", nil
+	}
+
+	return s, nil
+}
+
+type Hex string
+type Ansi string
+type RGB struct {
+	R int
+	G int
+	B int
+}
+
+func HextoRGB(hex Hex) RGB {
+	if hex[0:1] == "#" {
+		hex = hex[1:]
+	}
+
+	r := string(hex)[0:2]
+	g := string(hex)[2:4]
+	b := string(hex)[4:6]
+
+	R, _ := strconv.ParseInt(r, 16, 0)
+	G, _ := strconv.ParseInt(g, 16, 0)
+	B, _ := strconv.ParseInt(b, 16, 0)
+
+	return RGB{int(R), int(G), int(B)}
+
+}
+
+func HextoAnsi(hex Hex) Ansi {
+	rgb := HextoRGB(hex)
+	str := "\x1b[38;2;" + strconv.FormatInt(int64(rgb.R), 10) + ";" + strconv.FormatInt(int64(rgb.G), 10) + ";" + strconv.FormatInt(int64(rgb.B), 10) + "m"
+	return Ansi(str)
+}
+
+func replaceColor(line string) string {
+	r := regexp.MustCompile(`\{#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\}`)
+
+	line = strings.ReplaceAll(line, "{clr}", "\x1b[0m")
+	if r.Match([]byte(line)) {
+		line = r.ReplaceAllStringFunc(line, func(line string) string {
+			str := line
+			// str = strings.ReplaceAll(str, "{clr}", "\x1b[0m")
+			str = strings.ReplaceAll(str, "{clr}", "")
+			str = strings.ReplaceAll(str, "{", "")
+			str = strings.ReplaceAll(str, "}", "")
+
+			hex := HextoAnsi(Hex(str))
+			return string(hex)
+		})
+		return line
+	}
+	return line
+}
+
+func echo(w io.Writer, noNewline, escape, backslash bool, s ...string) error {
+	var err error
+
+	if backslash {
+		escape = false
+	}
+
+	line := strings.Join(s, " ")
+	if escape {
+		line, err = escapeStr(line)
+		if err != nil {
+			return err
+		}
+	}
+
+	if *specialFormatter {
+		line = replaceColor(line)
+	}
+
+	format := "%s"
+	if !noNewline {
+		format += "\n"
+	}
+
+	_, err = fmt.Fprintf(w, format, line)
+	return err
+}
+
+func init() {
+	flag.Parse()
+	if *help {
+		fmt.Printf("%v", usage)
+		os.Exit(0)
+	}
+}
+
+func main() {
+	err := echo(os.Stdout, *noNewline, *interpretEscapes, *interpretBackslashEscapes, flag.Args()...)
+	if err != nil {
+		log.Fatalf("%v", err)
+	}
+
+}

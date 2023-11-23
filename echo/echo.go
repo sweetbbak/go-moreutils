@@ -1,9 +1,7 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	// flag "github.com/spf13/pflag"
 	"io"
 	"log"
 	"os"
@@ -13,11 +11,11 @@ import (
 )
 
 var (
-	noNewline                 = flag.Bool("n", false, "suppress newline")
-	help                      = flag.Bool("h", false, "print help message")
-	interpretEscapes          = flag.Bool("e", true, "enable interpretation of backslash escapes (default)")
-	interpretBackslashEscapes = flag.Bool("E", false, "disable interpretation of backslash escapes")
-	specialFormatter          = flag.Bool("f", false, "interpret hex colors {#1e1e1e}")
+	noNewline                 bool = false
+	help                      bool = false
+	interpretEscapes          bool = false
+	interpretBackslashEscapes bool = false
+	specialFormatter          bool = false
 )
 
 var usage = `USAGE:
@@ -25,7 +23,7 @@ echo <options> [strings]...
 		-e    interpret escape sequences
 		-n    suppress newlines
 		-E    disable interpretation of backslash sequences
-		-f    use special formatting replacement strings for hex colors "{#1e1e1e}Hello{clear}"	
+		-f    use special formatting replacement strings for hex colors "{#1e1e1e}Hello{clear}"
 `
 
 func escapeStr(s string) (string, error) {
@@ -85,6 +83,7 @@ func replaceColor(line string) string {
 			str := line
 			// str = strings.ReplaceAll(str, "{clr}", "\x1b[0m")
 			str = strings.ReplaceAll(str, "{clr}", "")
+			str = strings.ReplaceAll(str, "{clear}", "")
 			str = strings.ReplaceAll(str, "{", "")
 			str = strings.ReplaceAll(str, "}", "")
 
@@ -111,7 +110,7 @@ func echo(w io.Writer, noNewline, escape, backslash bool, s ...string) error {
 		}
 	}
 
-	if *specialFormatter {
+	if specialFormatter {
 		line = replaceColor(line)
 	}
 
@@ -124,18 +123,51 @@ func echo(w io.Writer, noNewline, escape, backslash bool, s ...string) error {
 	return err
 }
 
-func init() {
-	flag.Parse()
-	if *help {
-		fmt.Printf("%v", usage)
-		os.Exit(0)
+func parseargs() []string {
+
+	var args []string
+	for i := 0; i < len(os.Args); i++ {
+		if os.Args[i] == "-h" || os.Args[i] == "--help" {
+			fmt.Println(usage)
+			os.Exit(0)
+		}
+
+		// fmt.Println(os.Args[i])
+		if os.Args[i][0] == '-' {
+			// fmt.Println("flag start")
+			tacs := os.Args[i]
+			for x := 0; x < len(tacs); x++ {
+				if tacs[x] == ' ' {
+					break
+				}
+				switch tacs[x] {
+				case ' ':
+					// fmt.Println("Space character - flags ended")
+				case 'n':
+					// fmt.Println("no newline")
+					noNewline = true
+				case 'f':
+					// fmt.Println("format")
+					specialFormatter = true
+				case 'e':
+					// fmt.Println("escapes")
+					interpretEscapes = true
+				case 'E':
+					// fmt.Println("no escapes")
+					interpretBackslashEscapes = true
+				}
+			}
+		} else if i != 0 {
+			args = append(args, os.Args[i])
+		}
 	}
+	return args
 }
 
 func main() {
-	err := echo(os.Stdout, *noNewline, *interpretEscapes, *interpretBackslashEscapes, flag.Args()...)
+	args := parseargs()
+	err := echo(os.Stdout, noNewline, interpretEscapes, interpretBackslashEscapes, args...)
 	if err != nil {
 		log.Fatalf("%v", err)
 	}
-
 }

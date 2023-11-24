@@ -1,5 +1,3 @@
-# Go Coreutils
-
 <p></p>
 <p align="center">
   <img src="assets/core.png" />

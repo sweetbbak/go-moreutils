@@ -10,9 +10,18 @@ import (
 
 var (
 	pretty = flag.Bool("p", false, "colorize output of print-env")
+	// if flags.Args() exists, then assume we will lookup those variables and exit
 	Lookup bool
 )
 
+var (
+	White  string = "\x1b[38;2;255;255;255m"
+	Orange string = "\x1b[38;2;230;219;116m"
+	Pink   string = "\x1b[38;2;249;38;114m"
+	Clear  string = "\x1b[0m"
+)
+
+// iterate and lookup env vars that the user asks
 func lookupVars(e []string) {
 	for x := range e {
 		env, envbool := os.LookupEnv(e[x])
@@ -20,7 +29,6 @@ func lookupVars(e []string) {
 			fmt.Fprintf(os.Stdout, "%v\n", env)
 		}
 	}
-
 	os.Exit(0)
 }
 
@@ -37,6 +45,8 @@ func printenv(w io.Writer) {
 }
 
 func prettyPrint(e []string) {
+	// split vars on the left most '=' color left side white, right side yellow/orange
+	// and then re-join those args with a pink/red colored '='
 	for _, x := range e {
 		strs := strings.SplitN(x, "=", -1)
 		for i := 0; i < len(strs); i++ {
@@ -53,17 +63,6 @@ func prettyPrint(e []string) {
 		fmt.Println(s)
 	}
 }
-
-func white(s string) string {
-	return fmt.Sprintf("%x%v", White, s)
-}
-
-var (
-	White  string = "\x1b[38;2;255;255;255m"
-	Orange string = "\x1b[38;2;230;219;116m"
-	Pink   string = "\x1b[38;2;249;38;114m"
-	Clear  string = "\x1b[0m"
-)
 
 func init() {
 	flag.Parse()

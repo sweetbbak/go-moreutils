@@ -11,6 +11,7 @@ import (
 var (
 	_        = flag.Bool("L", true, "don't follow symlinks")
 	physical = flag.Bool("P", false, "follow all symlinks")
+	pretty   = flag.Bool("p", false, "pretty colored output")
 )
 
 func pwd(followSym bool) (string, error) {
@@ -18,6 +19,11 @@ func pwd(followSym bool) (string, error) {
 	if err == nil && followSym {
 		path, err = filepath.EvalSymlinks(path)
 	}
+
+	if *pretty {
+		path = fmt.Sprintf("\x1b[35m%s", path)
+	}
+
 	return path, err
 }
 

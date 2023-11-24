@@ -6,6 +6,10 @@
 </p>
 
 Coreutils with a modern spin.
+Why? Someone once said:
+"If I cannot write it, then I do not understand it..."
+and I took that to heart. This is purely for my entertainment and understanding of Unix systems,
+if you want something more reliable, try: u-root, busybox, toybox, gnu coreutils or rust-coreutils.
 
 ## Examples
 <p align="left">

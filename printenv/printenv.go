@@ -10,7 +10,19 @@ import (
 
 var (
 	pretty = flag.Bool("p", false, "colorize output of print-env")
+	Lookup bool
 )
+
+func lookupVars(e []string) {
+	for x := range e {
+		env, envbool := os.LookupEnv(e[x])
+		if envbool {
+			fmt.Fprintf(os.Stdout, "%v\n", env)
+		}
+	}
+
+	os.Exit(0)
+}
 
 func printenv(w io.Writer) {
 	e := os.Environ()
@@ -27,14 +39,7 @@ func printenv(w io.Writer) {
 func prettyPrint(e []string) {
 	for _, x := range e {
 		strs := strings.SplitN(x, "=", -1)
-		// strs[0] = fmt.Sprintf("%v%v%v", White, strs[0], Clear)
-		// strs[1] = fmt.Sprintf("%v%v%v", Orange, strs[1], Clear)
-
-		// fmt.Println(strs)
-
-		// for i = range strs[1:] {
 		for i := 0; i < len(strs); i++ {
-
 			switch i {
 			case 0:
 				strs[i] = fmt.Sprintf("%v%v%v", White, strs[i], Clear)
@@ -62,8 +67,18 @@ var (
 
 func init() {
 	flag.Parse()
+	if len(flag.Args()) > 0 {
+		Lookup = true
+	}
 }
 
+// i didn't know that printenv can be used like this `printenv BROWSER DIFFPAGER MANPAGER`
+// and it will look up these keys lol I thought it just printed the env vars
 func main() {
-	printenv(os.Stdout)
+	// flag.Args() is the remaining arguments after flags
+	if Lookup {
+		lookupVars(flag.Args())
+	} else {
+		printenv(os.Stdout)
+	}
 }

@@ -8,13 +8,13 @@ import (
 )
 
 var opts struct {
-	All    bool `short:"a" long:"all" description:"show group"`
+	All    bool `short:"a" long:"all" description:"show all user info"`
 	Pretty bool `short:"p" long:"pretty" description:"pretty print whoami"`
 	Group  bool `short:"g" long:"group" description:"show group"`
-	GID    bool `short:"G" long:"gid" description:"show group"`
-	UID    bool `short:"U" long:"uid" description:"show group"`
-	User   bool `short:"u" long:"user" description:"show group"`
-	Home   bool `short:"H" long:"home" description:"show group"`
+	GID    bool `short:"G" long:"gid" description:"show GID"`
+	UID    bool `short:"U" long:"uid" description:"show UID"`
+	User   bool `short:"u" long:"user" description:"show Username"`
+	Home   bool `short:"H" long:"home" description:"show users home dir path"`
 }
 
 type users struct {

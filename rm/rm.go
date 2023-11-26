@@ -1,3 +1,6 @@
+// use this package at your own risk, rm from GNU works just fine
+// this tool has no chance of being nearly as battle tested as busybox, GNU or otherwise
+// thanks to u-root, golang os.RemoveAll and aisola/go-coreutils
 package main
 
 import (
@@ -43,6 +46,21 @@ func Confirm(file string) (bool, error) {
 	}
 }
 
+// generic confirmation - used to confirm once for arg "-I"
+// removes the need to confirm rm for every single file
+func ConfrimOnce(prompt string) (bool, error) {
+	fmt.Fprintf(os.Stdout, prompt)
+	input := bufio.NewReader(os.Stdin)
+	answer, err := input.ReadString('\n')
+
+	// if answer string first character isnt equal to "y" then no confirmation provided
+	if err != nil || strings.ToLower(answer)[0] != 'y' {
+		return false, errors.New("No Confirmation")
+	} else {
+		return true, nil
+	}
+}
+
 // remove a normal file - ask for confirmation if necessary
 func RemoveFile(file string) error {
 	if opt.Interactive {
@@ -66,8 +84,12 @@ func RemoveFile(file string) error {
 		toRemove = filepath.Join(cwd, file)
 	}
 
-	fmt.Println("Removed: ", toRemove)
 	// remove func here
+	if err := os.RemoveAll(toRemove); err != nil {
+		return err
+	}
+
+	fmt.Println("Removed: ", toRemove)
 	//
 	return nil
 }
@@ -100,37 +122,33 @@ func RemoveDir(dir string) error {
 		toRemove = filepath.Join(cwd, dir)
 	}
 
-	fmt.Println("Removed: ", toRemove)
 	// remove func here
+	if err := os.RemoveAll(toRemove); err != nil {
+		return err
+	}
+
+	fmt.Println("Removed: ", toRemove)
 	//
 
 	return nil
 }
 
-// generic confirmation - used to confirm once for arg "-I"
-// removes the need to confirm rm for every single file
-func ConfrimOnce(prompt string) (bool, error) {
-	fmt.Fprintf(os.Stdout, prompt)
-	input := bufio.NewReader(os.Stdin)
-	answer, err := input.ReadString('\n')
-
-	// if answer string first character isnt equal to "y" then no confirmation provided
-	if err != nil || strings.ToLower(answer)[0] != 'y' {
-		return false, errors.New("No Confirmation")
-	} else {
-		return true, nil
-	}
-}
-
 // main function for removing a slice of files
 func RemoveFiles(files []string) error {
 	if len(files) < 1 {
-		return fmt.Errorf("%v", flags.ErrHelp)
+		return fmt.Errorf("No files")
 	}
 
 	// Confirm remove ALL files once instead of individually
 	if opt.InteractiveOnce {
-		prompt := fmt.Sprintf("Remove %d files? [y/N] ", len(files))
+
+		var prompt string
+		if opt.Recursive {
+			prompt = fmt.Sprintf("Remove %d files recursively? [y/N] ", len(files))
+		} else {
+			prompt = fmt.Sprintf("Remove %d files? [y/N] ", len(files))
+		}
+
 		conf, err := ConfrimOnce(prompt)
 		if err != nil {
 			return err
@@ -144,6 +162,7 @@ func RemoveFiles(files []string) error {
 		fi, err := os.Lstat(file)
 		if err != nil {
 			if err, ok := err.(*os.PathError); ok && (os.IsNotExist(err.Err) || err.Err == syscall.ENOTDIR) {
+				fmt.Println(err)
 				continue
 			}
 			continue
@@ -172,9 +191,8 @@ func main() {
 	// args will be our files to be removed
 	args, err := flags.Parse(&opt)
 	if err != nil {
-		log.Fatal(err)
+		os.Exit(0)
 	}
-	fmt.Println(&opt)
 
 	if opt.Verbose {
 		fmt.Println("Removing: ")

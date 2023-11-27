@@ -31,9 +31,9 @@ git clone https://github.com/sweetbbak/go-moreutils.git
 cd go-moreutils
 
 # from there you can cd into any of the commands directories and run:
-git build
+go build
 # or alternatively:
-git run *.go [args]
+go run *.go [args]
 # TODO add the justfile with options to build any tool or all tools at once
 just
 ```

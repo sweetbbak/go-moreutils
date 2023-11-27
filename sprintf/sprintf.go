@@ -1,3 +1,4 @@
+// thanks to: https://github.com/moxtsuan/printf
 package main
 
 import (
@@ -5,9 +6,66 @@ import (
 	"io"
 	"log"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 )
+
+type Hex string
+type Ansi string
+type RGB struct {
+	R int
+	G int
+	B int
+}
+
+func HextoRGB(hex Hex) RGB {
+	if hex[0:1] == "#" {
+		hex = hex[1:]
+	}
+
+	r := string(hex)[0:2]
+	g := string(hex)[2:4]
+	b := string(hex)[4:6]
+
+	R, _ := strconv.ParseInt(r, 16, 0)
+	G, _ := strconv.ParseInt(g, 16, 0)
+	B, _ := strconv.ParseInt(b, 16, 0)
+
+	return RGB{int(R), int(G), int(B)}
+
+}
+
+func HextoAnsi(hex Hex) Ansi {
+	rgb := HextoRGB(hex)
+	str := "\x1b[38;2;" + strconv.FormatInt(int64(rgb.R), 10) + ";" + strconv.FormatInt(int64(rgb.G), 10) + ";" + strconv.FormatInt(int64(rgb.B), 10) + "m"
+	return Ansi(str)
+}
+
+func replaceColor(line string) string {
+	// matches 3 hex color and 6 hex color
+	// r := regexp.MustCompile(`\{#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\}`)
+	r := regexp.MustCompile(`\{#(?:[0-9a-fA-F]{6})\}`)
+
+	line = strings.ReplaceAll(line, "{clr}", "\x1b[0m")
+	line = strings.ReplaceAll(line, "{clear}", "\x1b[0m")
+
+	if r.Match([]byte(line)) {
+		line = r.ReplaceAllStringFunc(line, func(line string) string {
+			str := line
+			// str = strings.ReplaceAll(str, "{clr}", "\x1b[0m")
+			// str = strings.ReplaceAll(str, "{clr}", "")
+			// str = strings.ReplaceAll(str, "{clear}", "")
+			str = strings.ReplaceAll(str, "{", "")
+			str = strings.ReplaceAll(str, "}", "")
+
+			hex := HextoAnsi(Hex(str))
+			return string(hex)
+		})
+		return line
+	}
+	return line
+}
 
 type FormatError struct {
 	bad string
@@ -23,7 +81,16 @@ func Fprintf(w io.Writer, format string, s []string) (n int, err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return fmt.Fprintf(w, format, a...)
+	//
+	str := fmt.Sprintf(format, a...)
+	if err != nil {
+		fmt.Println(err)
+	}
+	str = replaceColor(str)
+	return fmt.Fprintf(w, "%s", str)
+	//
+
+	// return fmt.Fprintf(w, format, a...)
 }
 
 func Printf(format string, s []string) (n int, err error) {

@@ -78,12 +78,14 @@ func replaceColor(line string) string {
 	r := regexp.MustCompile(`\{#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})\}`)
 
 	line = strings.ReplaceAll(line, "{clr}", "\x1b[0m")
+	line = strings.ReplaceAll(line, "{clear}", "\x1b[0m")
+
 	if r.Match([]byte(line)) {
 		line = r.ReplaceAllStringFunc(line, func(line string) string {
 			str := line
 			// str = strings.ReplaceAll(str, "{clr}", "\x1b[0m")
-			str = strings.ReplaceAll(str, "{clr}", "")
-			str = strings.ReplaceAll(str, "{clear}", "")
+			// str = strings.ReplaceAll(str, "{clr}", "")
+			// str = strings.ReplaceAll(str, "{clear}", "")
 			str = strings.ReplaceAll(str, "{", "")
 			str = strings.ReplaceAll(str, "}", "")
 

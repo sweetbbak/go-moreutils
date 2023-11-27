@@ -112,6 +112,7 @@ func formatReplace(f string) string {
 	f = strings.Replace(f, "\\v", "\v", -1)
 	f = strings.Replace(f, "\\'", "'", -1)
 	f = strings.Replace(f, "\\\"", "\"", -1)
+	f = strings.Replace(f, "\\e", "\x1b", -1)
 
 	return f
 }

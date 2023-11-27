@@ -23,6 +23,7 @@ func md5Sum(r io.Reader) ([]byte, error) {
 
 func md(w io.Writer, r io.Reader, args ...string) error {
 	var err error
+	// read from stdin if no files as args
 	if len(args) == 0 {
 		h, err := md5Sum(r)
 		if err != nil {
@@ -33,18 +34,20 @@ func md(w io.Writer, r io.Reader, args ...string) error {
 			return err
 		}
 	} else {
-		fileDesc, err := os.Open(args[0])
-		if err != nil {
-			return err
-		}
-		defer fileDesc.Close()
-		h, err := md5Sum(fileDesc)
-		if err != nil {
-			return err
-		}
-		_, err = fmt.Fprintf(w, "%x %s\n", h, args[0])
-		if err != nil {
-			return err
+		for _, file := range args {
+			fileDesc, err := os.Open(file)
+			if err != nil {
+				return err
+			}
+			defer fileDesc.Close()
+			h, err := md5Sum(fileDesc)
+			if err != nil {
+				return err
+			}
+			_, err = fmt.Fprintf(w, "%x %s\n", h, file)
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return err

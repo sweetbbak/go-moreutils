@@ -113,5 +113,4 @@ func main() {
 	if err := mknod(args); err != nil {
 		log.Fatal(err)
 	}
-
 }

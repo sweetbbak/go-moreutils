@@ -13,11 +13,11 @@ func main() {
 	}
 
 	for _, arg := range os.Args[1:] {
-		path, err := exec.LookPath(arg)
+		epath, err := exec.LookPath(arg)
 		if err != nil {
 			fmt.Printf("%v not found\n", arg)
 		} else {
-			fmt.Printf("%v\n", path)
+			fmt.Printf("%v\n", epath)
 		}
 	}
 

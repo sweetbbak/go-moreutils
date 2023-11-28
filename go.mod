@@ -3,6 +3,7 @@ module mybox
 go 1.21.4
 
 require (
+	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/go-git/go-git/v5 v5.10.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/spf13/pflag v1.0.5

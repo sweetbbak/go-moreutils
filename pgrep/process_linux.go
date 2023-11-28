@@ -35,7 +35,8 @@ func (p *UnixProcess) Refresh() error {
 // Returns start time of process, in number of clock ticks after
 // system boot. See "man 5 proc" -> /proc/[pid]/stat -> field 22
 // for details
-func StartTime(pid int) (int, error) {
+func (p *UnixProcess) StartTime() (int, error) {
+	pid := p.pid
 	if exists, _ := findProcess(pid); exists != nil {
 		procStat, err := os.ReadFile("/proc/" + strconv.Itoa(pid) + "/stat")
 		if err != nil {

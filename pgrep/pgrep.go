@@ -5,14 +5,16 @@ import (
 	"log"
 	"os"
 	"regexp"
+	"strconv"
 	"sync"
 
 	"github.com/jessevdk/go-flags"
 )
 
 var opts struct {
-	All  bool `short:"a" long:"all" description:"show all info"`
-	List bool `short:"l" long:"list" description:"print process name and PID"`
+	All   bool `short:"a" long:"all" description:"show all info"`
+	List  bool `short:"l" long:"list" description:"print process name and PID"`
+	byPid bool `short:"p" long:"pid" description:"print process name using the PID instead of a regex or name"`
 }
 
 type syncPids struct {
@@ -55,15 +57,15 @@ func decodeState(state rune) (string, error) {
 	case "R":
 		return "Running", nil
 	case "S":
-		return "Sleeping uninterruptible", nil
+		return "Sleeping", nil
 	case "D":
-		return "Waiting uninterruptible", nil
+		return "Waiting", nil
 	case "Z":
 		return "Zombie", nil
 	case "T":
-		return "Stopped on a signal", nil
+		return "Stopped", nil
 	case "t":
-		return "Tracing stopped", nil
+		return "Tracing", nil
 	case "X":
 		return "Dead", nil
 	case "x":
@@ -77,7 +79,7 @@ func decodeState(state rune) (string, error) {
 	case "I":
 		return "Idle", nil
 	}
-	return "", fmt.Errorf("Unknown State")
+	return "Unknown", fmt.Errorf("Unknown State")
 }
 
 func printProc(proc Process) error {
@@ -123,9 +125,37 @@ func getProcs(args []string) error {
 	return nil
 }
 
+func getProcsPid(args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("No pattern")
+	}
+
+	p, err := strconv.Atoi(args[0])
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	match, err := findProcess(p)
+	if err != nil {
+		return err
+	}
+	if match != nil {
+		fmt.Printf("%v %v %v", match.Executable(), match.PPid(), match.State())
+	}
+
+	return nil
+}
+
 func main() {
 	args, err := flags.Parse(&opts)
 	if err != nil {
+		os.Exit(0)
+	}
+
+	if opts.byPid {
+		if err := getProcsPid(args); err != nil {
+			log.Fatal(err)
+		}
 		os.Exit(0)
 	}
 

@@ -12,9 +12,9 @@ import (
 )
 
 var opts struct {
-	All   bool `short:"a" long:"all" description:"show all info"`
-	List  bool `short:"l" long:"list" description:"print process name and PID"`
-	byPid bool `short:"p" long:"pid" description:"print process name using the PID instead of a regex or name"`
+	All  bool `short:"a" long:"all" description:"show all info"`
+	List bool `short:"l" long:"list" description:"print process name and PID"`
+	Pid  bool `short:"p" long:"pid" description:"print process name using the PID instead of a regex or name"`
 }
 
 type syncPids struct {
@@ -140,7 +140,7 @@ func getProcsPid(args []string) error {
 		return err
 	}
 	if match != nil {
-		fmt.Printf("%v %v %v", match.Executable(), match.PPid(), match.State())
+		fmt.Printf("%v %v\n", match.Executable(), match.Pid())
 	}
 
 	return nil
@@ -152,7 +152,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	if opts.byPid {
+	if opts.Pid {
 		if err := getProcsPid(args); err != nil {
 			log.Fatal(err)
 		}

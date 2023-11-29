@@ -1,12 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
-	"slices"
-	"strings"
 	"syscall"
 
 	"github.com/jessevdk/go-flags"
@@ -27,19 +24,6 @@ func getShell() string {
 		sh = "/bin/bash"
 	}
 	return sh
-}
-
-// WriteUsermap builds a map of Host UID -> Namespace UID.
-// Example:
-//
-//	WriteUsermap(map[uint32]uint32{userns.OriginalUID: 0, 1234: 1234})
-func WriteUsermap(mapping map[uint32]uint32) error {
-	lines := []string{}
-	for h, c := range mapping {
-		lines = append(lines, fmt.Sprintf("%d %d 1", c, h))
-	}
-	slices.Sort(lines)
-	return os.WriteFile("/proc/self/uid_map", []byte(strings.Join(lines, "\n")), 0o644)
 }
 
 func unshare(args []string) error {

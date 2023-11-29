@@ -14,16 +14,26 @@ if you want something battle tested, try: u-root, busybox, toybox, gnu coreutils
   <img src="assets/img.png" />
 </p>
 
-echo support HEX colors with the `-f` switch
+`echo` support HEX colors with the `-f` switch
 ```bash
   ./echo -f '{#1e1e1e}HELLO{#clr}'
 ```
 
-printenv has colored output
+`printenv`has colored output
 ```bash
   ./printenv -p
 ```
 ![print env with colored output monokai theme](assets/printenv.png)
+
+`sleep`
+```sh
+./sleep --exec 'notify-send "hello world" -i /path/to/image' 99s
+# sleep accepts down to Nanoseconds and up to days
+./sleep --exec 'notify-send "hello world" -i /path/to/image' 99us
+# it also has a timer that prints to the terminal
+./sleep --print --exec 'notify-send "hello world" -i /path/to/image' 9999ms
+  
+```
 
 ## Installation
 ```sh

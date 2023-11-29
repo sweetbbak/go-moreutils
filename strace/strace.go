@@ -70,13 +70,11 @@ func strace(args []string) error {
 
 		err = syscall.PtraceSyscall(pid, 0)
 		if err != nil {
-			// panic(err)
 			return err
 		}
 
 		_, err = syscall.Wait4(pid, nil, 0, nil)
 		if err != nil {
-			// panic(err)
 			return err
 		}
 

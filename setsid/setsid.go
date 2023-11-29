@@ -37,20 +37,36 @@ func Setsid(args []string) (int, error) {
 		Sys:   s,
 	}
 
-	pid, err := syscall.ForkExec(args[0], args[1:], &sy)
+	pid, err := syscall.ForkExec(args[0], args[0:], &sy)
 	if err != nil {
 		return 0, err
 	}
 	return pid, nil
 }
 
+// command to run with setsid
 func runSetsid(args []string) error {
 	pid, err := Setsid(args)
 	if err != nil {
 		return err
 	}
+
 	if opts.Verbose {
 		log.Printf("Started PID: [%d]", pid)
+	}
+
+	if opts.Wait {
+
+		var wstat syscall.WaitStatus
+
+		wpid, err := syscall.Wait4(pid, &wstat, 0, nil)
+		if err != nil {
+			return err
+		}
+
+		if opts.Verbose {
+			log.Printf("Waiting for [%d]", wpid)
+		}
 	}
 	return nil
 }

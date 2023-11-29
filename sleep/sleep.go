@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -14,16 +15,27 @@ var opts struct {
 	Exec string `short:"e" long:"exec" description:"command to run after timer equivalent to using sleep 1 && cmd"`
 }
 
+func IsLetter(s string) bool {
+	for _, r := range s {
+		if (r < 'a' || r > 'z') && (r < 'A' || r > 'Z') {
+			return false
+		}
+	}
+	return true
+}
+
 func Sleep(args []string) (time.Duration, error) {
 	var ti time.Duration
 
 	for _, arg := range args {
-		if len(arg) == 1 {
+		// if len(arg) == 1 || !is_alpha(arg) {
+		if len(arg) == 1 || !IsLetter(arg) {
 			arg += "s"
 		}
 
 		d, err := time.ParseDuration(arg)
 		if err != nil {
+			fmt.Println(err)
 			return ti, err
 		}
 		return d, nil

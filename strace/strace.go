@@ -14,6 +14,7 @@ import (
 var opts struct {
 	Print    bool     `short:"p" long:"print" description:"print syscalls as they are made VS waiting until the end"`
 	Disallow []string `short:"d" long:"disallow" description:"syscalls to block"`
+	Quiet    bool     `short:"q" long:"quiet" description:"useful for muting stace output when you want to disallow syscalls"`
 	Verbose  bool     `short:"v" long:"verbose" description:"describe what program is doing"`
 }
 
@@ -60,7 +61,7 @@ func strace(args []string) error {
 				break
 			}
 
-			if opts.Print {
+			if opts.Print && !opts.Quiet {
 				// Uncomment to show each syscall as it's called
 				name := ss.getName(regs.Orig_rax)
 				fmt.Printf("%s\n", name)
@@ -81,7 +82,9 @@ func strace(args []string) error {
 		exit = !exit
 	}
 
-	ss.print()
+	if !opts.Quiet {
+		ss.print()
+	}
 	return nil
 }
 

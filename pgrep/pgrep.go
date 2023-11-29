@@ -12,9 +12,10 @@ import (
 )
 
 var opts struct {
-	All  bool `short:"a" long:"all" description:"show all info"`
-	List bool `short:"l" long:"list" description:"print process name and PID"`
-	Pid  bool `short:"p" long:"pid" description:"print process name using the PID instead of a regex or name"`
+	All     bool `short:"a" long:"list-full" description:"show all info"`
+	ListAll bool `short:"A" long:"show" description:"show all processes"`
+	List    bool `short:"l" long:"list-name" description:"print process name and PID"`
+	Pid     bool `short:"p" long:"pid" description:"print process name using the PID instead of a regex or name"`
 }
 
 type syncPids struct {
@@ -109,6 +110,12 @@ func printProc(proc Process) error {
 	return nil
 }
 
+func listProcs(procs []Process) {
+	for _, p := range procs {
+		printProc(p)
+	}
+}
+
 func getProcs(args []string) error {
 	if len(args) < 1 {
 		return fmt.Errorf("No pattern")
@@ -161,6 +168,15 @@ func main() {
 	if opts.Pid {
 		if err := getProcsPid(args); err != nil {
 			log.Fatal(err)
+		}
+		os.Exit(0)
+	}
+
+	if opts.ListAll {
+		if procs, err := processes(); err != nil {
+			log.Fatal(err)
+		} else {
+			listProcs(procs)
 		}
 		os.Exit(0)
 	}

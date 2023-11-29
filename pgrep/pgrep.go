@@ -88,7 +88,9 @@ func printProc(proc Process) error {
 		if err != nil {
 			return err
 		}
-		render := fmt.Sprintf("%v %v %v", proc.Pid(), proc.Executable(), state)
+		pid := proc.Pid()
+		cmd, _ := Cmdline(pid)
+		render := fmt.Sprintf("%v %v %v %v", pid, proc.Executable(), cmd, state)
 		fmt.Println(render)
 		return nil
 	}
@@ -140,7 +142,11 @@ func getProcsPid(args []string) error {
 		return err
 	}
 	if match != nil {
-		fmt.Printf("%v %v\n", match.Executable(), match.Pid())
+		pid := match.Pid()
+		exe := match.Executable()
+		t, _ := StartTime(pid)
+		cmd, _ := Cmdline(pid)
+		fmt.Printf("pid: %v exe: %v cmd: %v Clock: %v\n", pid, exe, cmd, t)
 	}
 
 	return nil

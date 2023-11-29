@@ -34,6 +34,14 @@ func (p *UnixProcess) Pid() int {
 	return p.pid
 }
 
+func (p *UnixProcess) Sid() int {
+	return p.sid
+}
+
+func (p *UnixProcess) Pgrp() int {
+	return p.pgrp
+}
+
 func (p *UnixProcess) PPid() int {
 	return p.ppid
 }

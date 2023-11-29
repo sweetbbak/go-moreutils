@@ -1,8 +1,7 @@
-//go:build linux
-
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strconv"
@@ -35,8 +34,8 @@ func (p *UnixProcess) Refresh() error {
 // Returns start time of process, in number of clock ticks after
 // system boot. See "man 5 proc" -> /proc/[pid]/stat -> field 22
 // for details
-func (p *UnixProcess) StartTime() (int, error) {
-	pid := p.pid
+func StartTime(pid int) (int, error) {
+	// pid := p.pid
 	if exists, _ := findProcess(pid); exists != nil {
 		procStat, err := os.ReadFile("/proc/" + strconv.Itoa(pid) + "/stat")
 		if err != nil {
@@ -52,4 +51,16 @@ func (p *UnixProcess) StartTime() (int, error) {
 		return startTime, nil
 	}
 	return 0, nil
+}
+
+func Cmdline(pid int) (string, error) {
+	if exists, _ := findProcess(pid); exists != nil {
+		procStat, err := os.ReadFile("/proc/" + strconv.Itoa(pid) + "/cmdline")
+		if err != nil {
+			return "", err
+		}
+		procStat = bytes.ReplaceAll(procStat, []byte("\x00"), []byte(" "))
+		return string(procStat), nil
+	}
+	return "", nil
 }

@@ -1,3 +1,5 @@
+// thanks to smallnest for giving me a good idea of how this is done in Golang
+// https://gist.github.com/smallnest/de6134e36b83fd6d215edf8db787235f
 package main
 
 import (

@@ -12,10 +12,11 @@ import (
 )
 
 var opts struct {
-	All     bool `short:"a" long:"list-full" description:"show all info"`
-	ListAll bool `short:"A" long:"show" description:"show all processes"`
-	List    bool `short:"l" long:"list-name" description:"print process name and PID"`
-	Pid     bool `short:"p" long:"pid" description:"print process name using the PID instead of a regex or name"`
+	All       bool `short:"a" long:"list-full" description:"show all info"`
+	ListAll   bool `short:"A" long:"show" description:"show all processes"`
+	List      bool `short:"l" long:"list-name" description:"print process name and PID"`
+	Pid       bool `short:"p" long:"pid" description:"print process name using the PID instead of a regex or name"`
+	ParentPid int  `short:"P" long:"parent" description:"print all processes that have a PID as parent process - pgrep -P <pid>"`
 }
 
 type syncPids struct {
@@ -159,6 +160,21 @@ func getProcsPid(args []string) error {
 	return nil
 }
 
+func parents() ([]Process, error) {
+	ppid := opts.ParentPid
+	var matches []Process
+	procs, err := processes()
+	if err != nil {
+		return nil, err
+	}
+	for _, item := range procs {
+		if item.PPid() == ppid {
+			matches = append(matches, item)
+		}
+	}
+	return matches, nil
+}
+
 func main() {
 	args, err := flags.Parse(&opts)
 	if err != nil {
@@ -177,6 +193,18 @@ func main() {
 			log.Fatal(err)
 		} else {
 			listProcs(procs)
+		}
+		os.Exit(0)
+	}
+
+	if opts.ParentPid != 0 {
+		// take pid and find all procs that have that as ppid
+		matches, err := parents()
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, proc := range matches {
+			fmt.Println(proc.Pid())
 		}
 		os.Exit(0)
 	}

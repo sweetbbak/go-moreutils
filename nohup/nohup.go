@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	// "strings"
+	"strings"
 	"syscall"
 	"time"
 )
@@ -82,10 +82,12 @@ func nohup(cmd []string) int {
 		fmt.Println(err)
 	}
 
-	shup()
-	// cmdstr := strings.Join(cmd, " ")
-	exitCode := System(cmd, output, true)
-	return exitCode
+	// shup()
+	cmdstr := strings.Join(cmd, " ")
+	Start(output, cmdstr)
+	// exitCode := System(cmd, output, true)
+	// return exitCode
+	return 0
 }
 
 // func System(cmd string, out *os.File, ignoreStdin bool) int {
@@ -132,7 +134,7 @@ func Janitor(file string, size int) {
 	}
 }
 
-func Start(args ...string) (p *os.Process, err error) {
+func Start(out *os.File, args ...string) (p *os.Process, err error) {
 	if args[0], err = exec.LookPath(args[0]); err == nil {
 		var procAttr os.ProcAttr
 		// procAttr.Files = []*os.File{
@@ -142,7 +144,7 @@ func Start(args ...string) (p *os.Process, err error) {
 		// }
 
 		sys := syscall.SysProcAttr{
-			Setsid: false,
+			Setsid: true,
 		}
 
 		cwd, _ := os.Getwd()
@@ -151,7 +153,7 @@ func Start(args ...string) (p *os.Process, err error) {
 			Dir:   cwd,
 			Env:   os.Environ(),
 			Sys:   &sys,
-			Files: []*os.File{os.Stdin, os.Stdout, os.Stderr},
+			Files: []*os.File{os.Stdin, out, out},
 		}
 
 		// procAttr.Sys.Ptrace = true

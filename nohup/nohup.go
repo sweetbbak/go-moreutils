@@ -7,7 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"os/signal"
-	"strings"
+	// "strings"
 	"syscall"
 	"time"
 )
@@ -67,8 +67,15 @@ func fd_reopen(fd2 int, file string, flags int, mode fs.FileMode) int {
 
 func CatchHup(sigs chan os.Signal) {
 	for {
+		signal.Ignore(syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
 		sig := <-sigs
-		log.Println("recieved: ", sig)
+		switch sig {
+		case syscall.SIGINT:
+			log.Println("recieved int: ", sig)
+			signal.Ignore(syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+			// continue
+		}
+		<-sigs
 	}
 }
 
@@ -82,26 +89,26 @@ func nohup(cmd []string) int {
 		fmt.Println(err)
 	}
 
-	// shup()
-	cmdstr := strings.Join(cmd, " ")
-	Start(output, cmdstr)
-	// exitCode := System(cmd, output, true)
-	// return exitCode
-	return 0
+	// cmdstr := strings.Join(cmd, " ")
+	// p, err := Start(output, cmdstr)
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+	// time.Sleep(2 * time.Second)
+	// p.Signal(syscall.SIGHUP)
+
+	exitCode := System(cmd, output, true)
+	return exitCode
 }
 
 // func System(cmd string, out *os.File, ignoreStdin bool) int {
 func System(cmd []string, out *os.File, ignoreStdin bool) int {
-	go shup()
 	c := exec.Command(cmd[0], cmd[1:]...)
-	// c.Stdin
 	c.Stdout = out
 	c.Stderr = out
 	err := c.Run()
-	// err := c.Start()
 	logOut := fmt.Sprintf("startd process of PID [%v]", c.Process.Pid)
 	out.WriteString(logOut)
-	// c.Wait()
 
 	if err == nil {
 		return 0
@@ -137,12 +144,6 @@ func Janitor(file string, size int) {
 func Start(out *os.File, args ...string) (p *os.Process, err error) {
 	if args[0], err = exec.LookPath(args[0]); err == nil {
 		var procAttr os.ProcAttr
-		// procAttr.Files = []*os.File{
-		// 	os.Stdin,
-		// 	os.Stdout,
-		// 	os.Stderr,
-		// }
-
 		sys := syscall.SysProcAttr{
 			Setsid: true,
 		}
@@ -155,8 +156,6 @@ func Start(out *os.File, args ...string) (p *os.Process, err error) {
 			Sys:   &sys,
 			Files: []*os.File{os.Stdin, out, out},
 		}
-
-		// procAttr.Sys.Ptrace = true
 
 		p, err := os.StartProcess(args[0], args, &procAttr)
 		if err == nil {
@@ -171,21 +170,35 @@ func shup() {
 	sigs := make(chan os.Signal)
 	// notify channel
 	if !signal.Ignored(syscall.SIGHUP) {
+		signal.Ignore(syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 		signal.Notify(sigs, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	} else {
 		fmt.Println("signal is ignored")
 	}
 	// catch the SIGHUP signal (Hangup - often from terminal close)
-	go CatchHup(sigs)
+	CatchHup(sigs)
 }
 
 func main() {
 	// channel
-	sigs := make(chan os.Signal)
+	// sigs := make(chan os.Signal, 5)
 	// notify channel
-	signal.Notify(sigs, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+	// signal.Notify(sigs, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
 	// catch the SIGHUP signal (Hangup - often from terminal close)
-	go CatchHup(sigs)
+	// go CatchHup(sigs)
+	// go shup()
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		for sig := range c {
+			// sig is a ^C, handle it
+			switch sig {
+			case syscall.SIGINT:
+				fmt.Println(sig)
+			}
+		}
+	}()
 
 	cmd := os.Args[1:]
 	// Start(cmd...)

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"strings"
-	// "os"
+	"syscall"
+	"time"
 )
 
 var (
@@ -14,6 +16,12 @@ var (
 	Regex bool
 	Cmd   bool
 )
+
+var usage = `Usage:
+		
+Examples:
+	killer -c "start-as=fullscreen"
+	`
 
 func init() {
 	flag.StringVar(&File, "f", "", "path to a file with a list of process names to block")
@@ -26,6 +34,7 @@ func init() {
 	flag.BoolVar(&Cmd, "cmd", false, "match args used for a process")
 }
 
+// get list of all processes
 func getProcs() ([]Process, error) {
 	p, err := processes()
 	if err != nil {
@@ -34,6 +43,7 @@ func getProcs() ([]Process, error) {
 	return p, nil
 }
 
+// iterate process list for matching block list items
 func ProcessPid(arg string, p []Process) ([]Process, error) {
 	var matches []Process
 	for _, proc := range p {
@@ -50,10 +60,9 @@ func ProcessPid(arg string, p []Process) ([]Process, error) {
 				continue
 			}
 
-			self := os.Getpid()
 			parent := os.Getppid()
 			if strings.Contains(cmdargs, arg) && proc.Pid() != parent && proc.PPid() != parent {
-				fmt.Println(cmdargs, arg, self, parent)
+				// fmt.Println(cmdargs, arg, self, parent)
 				fmt.Printf("Found substring  match: %v of [PID] %v\n", proc.Executable(), proc.Pid())
 				matches = append(matches, proc)
 			}
@@ -69,17 +78,64 @@ func ProcessPid(arg string, p []Process) ([]Process, error) {
 	return matches, nil
 }
 
-func WatchDog(args []string) error {
-	p, _ := getProcs()
-	for _, arg := range args {
-		ProcessPid(arg, p)
+// iterate over list of matching procs and send to kill
+func KillMatches(procs []Process) {
+	for _, proc := range procs {
+		err := kill(os.Kill, proc.Pid())
+		if err != nil {
+			log.Printf("unable to kill process: %v", err)
+		} else {
+			log.Printf("Killed process: %v of [PID] %v", proc.Executable(), proc.Pid())
+		}
+	}
+}
+
+// kill PID with Signal
+func kill(sig os.Signal, pid int) error {
+	s := sig.(syscall.Signal)
+	if err := syscall.Kill(pid, s); err != nil {
+		return err
 	}
 	return nil
 }
 
+// scan processes - send to be processed - send to be killed
+func WatchDog(args []string) error {
+	p, _ := getProcs()
+	for _, arg := range args {
+		matches, err := ProcessPid(arg, p)
+		if err != nil {
+			log.Println(err)
+		}
+		go KillMatches(matches)
+	}
+	return nil
+}
+
+// capture signals that kill the main program
+func handleKillSignal() {
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
+	go func() {
+		for {
+			<-signalChan
+			println("bye bye!")
+			os.Exit(0)
+		}
+	}()
+}
+
 func main() {
 	flag.Parse()
-	if err := WatchDog(flag.Args()); err != nil {
-		log.Fatal(err)
+
+	// handle signals and exit
+	handleKillSignal()
+
+	// loop in the background while looking for procs to kill
+	for {
+		time.Sleep(1 * time.Second)
+		if err := WatchDog(flag.Args()); err != nil {
+			log.Println(err)
+		}
 	}
 }

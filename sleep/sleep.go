@@ -117,6 +117,10 @@ func Eepy(args []string) error {
 func main() {
 	args, err := flags.Parse(&opts)
 	if err != nil {
+		if flags.WroteHelp(err) {
+			fmt.Println("[UNITS] us, ns, ms, s, m, h")
+			fmt.Println("[EXAMPLES] 1h22m333ms, 1s, 1m, 99us, 500ms, 2h30m")
+		}
 		os.Exit(0)
 	}
 

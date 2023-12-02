@@ -6,6 +6,7 @@ require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/go-git/go-git/v5 v5.10.0
 	github.com/jessevdk/go-flags v1.5.0
+	github.com/ogier/pflag v0.0.1
 	github.com/seccomp/libseccomp-golang v0.10.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sys v0.14.0

@@ -18,7 +18,7 @@
 
 # Loop X number of times
 ./sleep --loop 10 --exec "set_wallpaper.sh" 1h
-# -1 is an infinite loop (technically 999,999,999 times)
+# -1 is an infinite loop
 ./sleep --verbose --loop -1 --exec 'ls -lah' 0.1s
 ```
 

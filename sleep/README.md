@@ -1,6 +1,10 @@
 ## Sleep
 
 ```sh
+# default sleep unit is seconds, it can be implied:
+./sleep 1
+./sleep 0.5
+./sleep 10.5
 # milli
 ./sleep --exec "notify-send helloworld" 100000ms
 # nano
@@ -10,7 +14,12 @@
 # seconds
 ./sleep --exec "notify-send helloworld" 33s &
 # Print the timer as it runs
-./sleep --exec "notify-send helloworld" 3m --print
+./sleep --print --exec "notify-send helloworld" 3m
+
+# Loop X number of times
+./sleep --loop 10 --exec "set_wallpaper.sh" 1h
+# -1 is an infinite loop (technically 999,999,999 times)
+./sleep --verbose --loop -1 --exec 'ls -lah' 0.1s
 ```
 
 ### Duration

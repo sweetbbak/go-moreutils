@@ -118,8 +118,8 @@ func main() {
 	args, err := flags.Parse(&opts)
 	if err != nil {
 		if flags.WroteHelp(err) {
-			fmt.Println("[UNITS] us, ns, ms, s, m, h")
-			fmt.Println("[EXAMPLES] 1h22m333ms, 1s, 1m, 99us, 500ms, 2h30m")
+			fmt.Println("[\x1b[31mUNITS\x1b[0m] us, ns, ms, s, m, h")
+			fmt.Println("[\x1b[31mEXAMPLES\x1b[0m] 1s, 1m, 99us, 500ms, 2h30m, 1h22m333ms")
 		}
 		os.Exit(0)
 	}

@@ -94,7 +94,7 @@ func Cat(args []string) error {
 	}
 
 	if opts.Verbose {
-		fmt.Fprintln(os.Stderr, byte_count)
+		fmt.Fprintf(os.Stderr, "bytes: %d\n", byte_count)
 	}
 	return nil
 }

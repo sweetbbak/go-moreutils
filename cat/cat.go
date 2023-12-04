@@ -26,10 +26,6 @@ func openfile(s string) (io.ReadWriteCloser, error) {
 	}
 
 	// bitwise operation
-	fmt.Println(file.Mode())
-	fmt.Println(os.ModeSocket)
-	fmt.Println(file.Mode() & os.ModeSocket)
-
 	if file.Mode()&os.ModeSocket != 0 {
 		return net.Dial("unix", s)
 	}

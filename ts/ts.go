@@ -7,6 +7,10 @@ import (
 )
 
 func parseFlags() {
+	if len(os.Args) == 1 {
+		return
+	}
+
 	args := os.Args[1:]
 	if len(args) == 1 && args[0] == "-h" || args[0] == "--help" {
 		println("usage: ts")

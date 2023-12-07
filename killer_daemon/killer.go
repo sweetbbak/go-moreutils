@@ -115,7 +115,8 @@ func WatchDog(args []string) error {
 // capture signals that kill the main program
 func handleKillSignal() {
 	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGKILL)
+	// sigkill apparently cannot be caught
+	signal.Notify(signalChan, syscall.SIGTERM, syscall.SIGINT)
 	go func() {
 		for {
 			<-signalChan

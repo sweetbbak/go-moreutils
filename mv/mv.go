@@ -54,16 +54,20 @@ func moveFile(source string, dest string) error {
 	return nil
 }
 
-func mv(files []string, todir bool) error {
+func mv(files []string, todir bool, dest string) error {
 	// rename or move a file
 	if len(files) == 2 && !todir {
 		if err := moveFile(files[0], files[1]); err != nil {
 			return err
 		}
 	} else {
-		destdir := files[len(files)-1]
-		for _, f := range files[:len(files)-1] {
-			newPath := filepath.Join(destdir, filepath.Base(f))
+		// if dest is set not set explicitly we assume the last argument is the dest and exclude it from mv
+		if opt.Destination == "" {
+			files = files[:len(files)-1]
+		}
+		// destdir := files[len(files)-1]
+		for _, f := range files {
+			newPath := filepath.Join(dest, filepath.Base(f))
 			if err := moveFile(f, newPath); err != nil {
 				return err
 			}
@@ -89,7 +93,7 @@ func move(files []string) error {
 	if len(files) > 2 && !todir {
 		return fmt.Errorf("not a directory: %s", dest)
 	}
-	return mv(files, todir)
+	return mv(files, todir, dest)
 }
 
 func main() {

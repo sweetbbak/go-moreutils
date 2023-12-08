@@ -65,7 +65,6 @@ func mv(files []string, todir bool, dest string) error {
 		if opt.Destination == "" {
 			files = files[:len(files)-1]
 		}
-		// destdir := files[len(files)-1]
 		for _, f := range files {
 			newPath := filepath.Join(dest, filepath.Base(f))
 			if err := moveFile(f, newPath); err != nil {

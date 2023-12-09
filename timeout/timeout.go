@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"strings"
+	"syscall"
 	"time"
 )
 
@@ -49,4 +51,30 @@ func main() {
 		log.Printf("timeout [%v]: %v", *timeout, err)
 		os.Exit(exitCode)
 	}
+}
+
+func (c *cmd) System() int {
+	cmd := strings.Join(c.args, " ")
+	cm := exec.Command("sh", "-c", cmd)
+	cm.Stdin = os.Stdin
+	cm.Stdout = os.Stdout
+	cm.Stderr = os.Stderr
+	err := cm.Run()
+
+	if err == nil {
+		return 0
+	}
+
+	// Figure out the exit code
+	if ws, ok := cm.ProcessState.Sys().(syscall.WaitStatus); ok {
+		if ws.Exited() {
+			return ws.ExitStatus()
+		}
+
+		if ws.Signaled() {
+			return -int(ws.Signal())
+		}
+	}
+
+	return -1
 }

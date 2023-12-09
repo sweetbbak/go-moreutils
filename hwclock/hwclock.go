@@ -11,7 +11,10 @@ import (
 	"golang.org/x/sys/unix"
 )
 
-var write = flag.Bool("w", false, "set the hwclock from system clock in UTC time")
+var (
+	write      = flag.Bool("w", false, "set the hwclock from system clock in UTC time")
+	unixFormat = flag.Bool("x", false, "get hardware clock time in a Unix epoch format")
+)
 
 type RTC struct {
 	file *os.File
@@ -110,5 +113,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(t.Local().Format("Mon 2 Jan 2006 15:04:05 AM MST"))
+	x := t.Local().Format("Mon Jan_2 15:04:05 MST 2006")
+	if *unixFormat {
+		fmt.Println(x)
+	} else {
+		fmt.Println(t.Local().Format("Mon 2 Jan 2006 15:04:05 AM MST"))
+	}
 }

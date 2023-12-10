@@ -7,6 +7,7 @@ require (
 	github.com/go-git/go-git/v5 v5.10.0
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/ogier/pflag v0.0.1
+	github.com/pkg/term v1.1.0
 	github.com/seccomp/libseccomp-golang v0.10.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sys v0.14.0

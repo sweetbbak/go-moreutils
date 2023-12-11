@@ -19,6 +19,7 @@ func main() {
 
 	if flag.NArg() < 1 {
 		fmt.Println("usage: mkfifo <path>")
+		fmt.Println("example: mkfifo -m 0o666 my-fifo")
 		log.Fatal("please provide a path, or multiple, to create a fifo")
 	}
 

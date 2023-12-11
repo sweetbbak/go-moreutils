@@ -12,18 +12,6 @@ var (
 	wsrow int
 )
 
-func navigate() {
-	a, _, err := getChar()
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	switch a {
-	case int('j'):
-	case int('k'):
-	}
-}
-
 func More(args []string) error {
 	oldState, err := makeRaw(os.Stdin.Fd())
 	if err != nil {
@@ -72,26 +60,35 @@ func PercentageChange(old, new int) (delta float64) {
 	return
 }
 
+// TODO allow switching from stdout or stderr for pipes
 func More2(args []string) error {
-	oldState, err := makeRaw(os.Stdin.Fd())
+	oldState, err := makeRaw(os.Stdout.Fd())
 	if err != nil {
 		return err
 	}
 
-	defer restoreTerminal(os.Stdin.Fd(), oldState)
+	defer restoreTerminal(os.Stdout.Fd(), oldState)
 	fmt.Print("\x1b[H\x1b[2J") // clear screen
+
+	if len(args) == 0 {
+		args = append(args, "-")
+	}
 
 	// stdout := os.Stdout
 	for _, file := range args {
-		f, err := os.Open(file)
-		if err != nil {
-			return err
+		var f *os.File
+		if file == "-" {
+			f = os.Stdin
+		} else {
+			f, err = os.Open(file)
+			if err != nil {
+				return err
+			}
 		}
 		defer f.Close()
 		// alt screen
 		fmt.Printf("\x1b[?1049h")
 
-		// frameBuf := lines + 10
 		buf := []string{}
 		scanner := bufio.NewScanner(f)
 		for scanner.Scan() {
@@ -112,7 +109,7 @@ func More2(args []string) error {
 				}
 			}
 			pc := PercentOf(n, len(buf))
-			status := fmt.Sprintf("%0.1f -- %s   [q/j/k]", pc, file)
+			status := fmt.Sprintf("%0.1f -- %s   [q quit/j down/k up]", pc, file)
 			// fmt.Printf("\x1b[7m\x1b[1;%vH -- %s\x1b[0m\n", lines+2, status)
 			fmt.Printf("\x1b[7m \x1b[%v;1H -- %s \x1b[0m", lines+2, status)
 
@@ -142,6 +139,11 @@ func More2(args []string) error {
 func main() {
 	wscol, wsrow = get_term_size(os.Stdin.Fd())
 	lines = wsrow - 1
-	args := os.Args[1:]
+	var args []string
+	if len(os.Args) == 1 {
+		args = []string{}
+	} else {
+		args = os.Args[1:]
+	}
 	More2(args)
 }

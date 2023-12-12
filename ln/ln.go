@@ -64,12 +64,8 @@ func Symlink(args []string) error {
 
 func main() {
 	args, err := flags.Parse(&opts)
-	if err == flags.ErrHelp {
-		os.Exit(0)
-	}
 	if err != nil {
-		fmt.Printf("error parsing flags: %v\n", err)
-		os.Exit(1)
+		os.Exit(0)
 	}
 
 	if len(args) < 2 {

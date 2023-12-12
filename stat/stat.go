@@ -14,6 +14,8 @@ import (
 )
 
 var opts struct {
+	JsonOut bool `short:"j" long:"json" description:"output in json"`
+	Color   bool `short:"c" long:"color" description:"color output"`
 }
 
 type fStat struct {
@@ -27,7 +29,13 @@ type fStat struct {
 }
 
 func printStat(fst *fStat) {
-	format := "  File: %v\n  Type: %v\n  Size: %-11v Blocks: %-11v IO Block: %-11v\nDevice: %#-11v Inode : %-11v Links   : %-11v\nAccess: (%04o/%v)  Uid: (%5v/%8v)  Gid: (%5v/%8v)\nAccess: %v\nModify: %v\nChange: %v\n"
+	var format string
+	if opts.JsonOut {
+		// format = `[{"File": "%v",\n"Type": "%v",\n"Size": "%-11v",\n"Blocks": "%-11v",\n"Device": "%-11v",\n"Inode": "%-11v",\n"Links": "%-11v",\n"Access": "(%04o/%v)",\n"Uid": "(%5v/%8v)",\n"Gid": "(%5v/%8v)",\n"AccessTime": "%v",\n"Modify": "%v",\n"Change": "%v"\n}]`
+		format = `[{"File": "%v","Type": "%v","Size": "%v","Blocks": "%v","Block": "%v","Device": "%v","Inode": "%v","Links": "%v","Access": "(%04o/%v)","Uid": "(%v/%v)","Gid": "(%v/%v)","AccessTime": "%v","Modify": "%v","Change": "%v"}]`
+	} else {
+		format = "  File: %v\n  Type: %v\n  Size: %-11v Blocks: %-11v IO Block: %-11v\nDevice: %#-11v Inode : %-11v Links   : %-11v\nAccess: (%04o/%v)  Uid: (%5v/%8v)  Gid: (%5v/%8v)\nAccess: %v\nModify: %v\nChange: %v\n"
+	}
 	fmt.Printf(format, fst.file, fst.filetype, fst.sstat.Size(), fst.stat.Blocks, fst.stat.Blksize, fst.stat.Dev, fst.stat.Ino, fst.stat.Nlink, fst.mode, fst.sstat.Mode().String(), fst.stat.Uid, fst.usr.Username, fst.stat.Gid, fst.grp.Name, timespecToTime(fst.stat.Atim), timespecToTime(fst.stat.Mtim), timespecToTime(fst.stat.Ctim))
 }
 

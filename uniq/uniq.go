@@ -29,6 +29,7 @@ func uniqFile(f io.Reader) error {
 	// get first line to inlcusively compare it to the rest
 	scanner.Scan()
 	last := scanner.Text()
+	count = 1
 
 	for scanner.Scan() {
 		if opts.IgnoreCase {
@@ -53,7 +54,6 @@ func uniqFile(f io.Reader) error {
 					fmt.Println(last)
 				}
 			}
-			// count = 0
 		}
 		count += 1
 		last = scanner.Text()

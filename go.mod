@@ -6,12 +6,14 @@ require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/go-git/go-git/v5 v5.10.0
+	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/ogier/pflag v0.0.1
 	github.com/pkg/term v1.1.0
 	github.com/seccomp/libseccomp-golang v0.10.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sys v0.14.0
+	golang.org/x/tools v0.13.0
 )
 
 require (
@@ -34,6 +36,5 @@ require (
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/tools v0.13.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 )

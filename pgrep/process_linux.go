@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"os"
@@ -29,6 +30,32 @@ func (p *UnixProcess) Refresh() error {
 	// more info exists about each field there. As well as the short hand IDs for state. There are 52 fields
 	_, err = fmt.Sscanf(data, "%c %d %d %d", &p.state, &p.ppid, &p.pgrp, &p.sid)
 	return err
+}
+
+func GetMemory(pid int) (string, error) {
+	if exists, _ := findProcess(pid); exists != nil {
+		procStat, err := os.Open("/proc/" + strconv.Itoa(pid) + "/status")
+		if err != nil {
+			return "", err
+		}
+		match := "VmSize:"
+		scanner := bufio.NewScanner(procStat)
+		for scanner.Scan() {
+			if strings.Contains(scanner.Text(), match) {
+				splits := strings.SplitN(scanner.Text(), ":", 2)
+				if len(splits) == 2 {
+					str := strings.TrimSpace(splits[1])
+					if strings.Contains("kB", str) {
+						s := strings.Split(str, " ")
+						str = s[0]
+					}
+					return str, nil
+				}
+				break
+			}
+		}
+	}
+	return "", nil
 }
 
 // Returns start time of process, in number of clock ticks after

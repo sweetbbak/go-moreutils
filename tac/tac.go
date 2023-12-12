@@ -20,7 +20,7 @@ func reverseStdin() error {
 	for scanner.Scan() {
 		line = append(line, scanner.Text())
 	}
-	for i := len(line) - 1; i != 0; i-- {
+	for i := len(line) - 1; i >= 0; i-- {
 		fmt.Println(line[i])
 	}
 	return nil

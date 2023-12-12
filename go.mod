@@ -5,6 +5,7 @@ go 1.21.4
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/cenkalti/backoff/v4 v4.2.1
+	github.com/dustin/go-humanize v1.0.1
 	github.com/go-git/go-git/v5 v5.10.0
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
 	github.com/jessevdk/go-flags v1.5.0

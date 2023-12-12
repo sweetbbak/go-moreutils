@@ -14,6 +14,7 @@ import (
 var opts struct {
 	All       bool `short:"a" long:"list-full" description:"show all info"`
 	ListAll   bool `short:"A" long:"show" description:"show all processes"`
+	Memory    bool `short:"m" description:"print memory usage of process"`
 	List      bool `short:"l" long:"list-name" description:"print process name and PID"`
 	Pid       bool `short:"p" long:"pid" description:"print process name using the PID instead of a regex or name"`
 	ParentPid int  `short:"P" long:"parent" description:"print all processes that have a PID as parent process - pgrep -P <pid>"`
@@ -92,7 +93,8 @@ func printProc(proc Process) error {
 		}
 		pid := proc.Pid()
 		cmd, _ := Cmdline(pid)
-		render := fmt.Sprintf("%v %v %v %v", pid, proc.Executable(), cmd, state)
+		mem, err := GetMemory(pid)
+		render := fmt.Sprintf("%v\t%v\t%v\t%v\t%v", pid, proc.Executable(), cmd, state, mem)
 		fmt.Println(render)
 		return nil
 	}
@@ -192,6 +194,7 @@ func main() {
 		if procs, err := processes(); err != nil {
 			log.Fatal(err)
 		} else {
+			fmt.Println("PID\tNAME\tCMD\tSTATE\tMEM")
 			listProcs(procs)
 		}
 		os.Exit(0)

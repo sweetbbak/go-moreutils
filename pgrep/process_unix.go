@@ -19,6 +19,8 @@ type Process interface {
 	Executable() string
 	// return process state
 	State() rune
+	// return memory
+	// GetMemory() string
 }
 
 type UnixProcess struct {
@@ -27,11 +29,16 @@ type UnixProcess struct {
 	state  rune
 	pgrp   int
 	sid    int
+	mem    string
 	binary string
 }
 
 func (p *UnixProcess) Pid() int {
 	return p.pid
+}
+
+func (p *UnixProcess) Mem() string {
+	return p.Mem()
 }
 
 func (p *UnixProcess) Sid() int {

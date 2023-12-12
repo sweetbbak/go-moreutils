@@ -22,6 +22,7 @@ func (p *UnixProcess) Refresh() error {
 	binStart := strings.IndexRune(data, '(') + 1
 	binEnd := strings.IndexRune(data[binStart:], ')')
 	p.binary = data[binStart : binStart+binEnd]
+	p.mem = p.Mem()
 
 	// move past image name and start parsing the rest
 	data = data[binStart+binEnd+2:]

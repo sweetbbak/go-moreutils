@@ -21,6 +21,26 @@ var opts struct {
 
 var Debug = func(string, ...interface{}) {}
 
+func printout(count int, last string, duplicate bool) {
+	if duplicate {
+		if opts.Repeats {
+			if opts.Count {
+				fmt.Printf("%-10d %s\n", count, last)
+			} else {
+				fmt.Println(last)
+			}
+		}
+	} else {
+		if opts.Unique {
+			if opts.Count {
+				fmt.Printf("%-10d %s\n", count, last)
+			} else {
+				fmt.Println(last)
+			}
+		}
+	}
+}
+
 func uniqFile(f io.Reader) error {
 	scanner := bufio.NewScanner(f)
 	var count int
@@ -38,25 +58,13 @@ func uniqFile(f io.Reader) error {
 			duplicate = last == scanner.Text() // bool
 		}
 
-		if duplicate {
-			if opts.Repeats {
-				if opts.Count {
-					fmt.Printf("%-10d %s\n", count, last)
-				} else {
-					fmt.Println(last)
-				}
-			}
-		} else {
-			if opts.Unique {
-				if opts.Count {
-					fmt.Printf("%-10d %s\n", count, last)
-				} else {
-					fmt.Println(last)
-				}
-			}
-		}
+		printout(count, last, duplicate)
 		count += 1
 		last = scanner.Text()
+	}
+
+	if last != "" {
+		printout(count, last, duplicate)
 	}
 	return nil
 }

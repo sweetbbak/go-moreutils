@@ -69,7 +69,24 @@ func fileInfoFor(path string, fs filesystem.FileSystem) error {
 	return nil
 }
 
+func printHelp() {
+	fmt.Println("usage: lsiso <path-to-isos>")
+	fmt.Println("\tsupports listing more than one iso at a time")
+}
+
 func main() {
-	i := os.Args[1]
-	PrintIsoInfo(i)
+	if len(os.Args) <= 1 {
+		printHelp()
+		os.Exit(0)
+	}
+
+	for _, file := range os.Args[1:] {
+		switch file {
+		case "-h", "--help":
+			printHelp()
+			os.Exit(0)
+		default:
+			PrintIsoInfo(file)
+		}
+	}
 }

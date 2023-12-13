@@ -7,7 +7,6 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/diskfs/go-diskfs v1.4.0
 	github.com/dustin/go-humanize v1.0.1
-	github.com/gdamore/tcell v1.4.0
 	github.com/gdamore/tcell/v2 v2.7.0
 	github.com/go-git/go-git/v5 v5.10.0
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70

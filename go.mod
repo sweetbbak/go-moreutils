@@ -11,6 +11,7 @@ require (
 	github.com/go-git/go-git/v5 v5.10.0
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
 	github.com/jessevdk/go-flags v1.5.0
+	github.com/kdomanski/iso9660 v0.4.0
 	github.com/ogier/pflag v0.0.1
 	github.com/pkg/term v1.1.0
 	github.com/seccomp/libseccomp-golang v0.10.0

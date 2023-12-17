@@ -3,8 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
+	"os/user"
 	"strings"
 	"syscall"
 	"time"
@@ -15,10 +17,6 @@ import (
 )
 
 var (
-	password    string
-	name        string
-	token       string
-	prompt      string
 	STDINFILENO int = 0
 )
 
@@ -51,11 +49,11 @@ func restore(raw *unix.Termios) {
 	}
 }
 
-func askpass() {
+func askpass() (string, error) {
 	// turn off terminal echo
 	raw, err := unix.IoctlGetTermios(STDINFILENO, unix.TCGETS)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	rawState := *raw
@@ -71,13 +69,18 @@ func askpass() {
 
 	err = unix.IoctlSetTermios(STDINFILENO, unix.TCSETS, &rawState)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
+	var password string
+	var prompt string
 
-	prompt = "\x1b[33m[\x1b[0m\x1b[32msuwudo\x1b[0m\x1b[33m]\x1b[0m password for %s: "
+	// prompt = "\x1b[33m[\x1b[0m\x1b[32msuwudo\x1b[0m\x1b[33m]\x1b[0m password for %s: "
+	prompt = "\x1b[38;2;111;111;111m│ \x1b[0m\x1b[38;2;124;120;254mpassword for \x1b[38;2;245;127;224m\x1b[3m%s\x1b[0m \x1b[38;2;124;120;254m>\x1b[0m "
+	// prompt = "%s > "
 	user := os.Getenv("USER")
-	// fmt.Printf(prompt, user)
-	// fmt.Scanln(&password)
+	if user == "" {
+		user = "user"
+	}
 
 	fmt.Fprintf(os.Stderr, "\x1b[2K")
 	fmt.Fprintf(os.Stderr, "\x1b[0G")
@@ -89,10 +92,13 @@ func askpass() {
 	fmt.Fprintf(os.Stderr, "\x1b[0G")
 	defer restore(raw)
 	fmt.Fprintf(os.Stderr, "\x1b[2K")
+	return password, nil
 }
 
 func get_user() string {
+	var name string
 	uid := os.Geteuid()
+	fmt.Println(uid)
 	// open pass file and read the user name from it by matching the UID
 	// sweet:x:1000:1000:sweet:/home/sweet:/bin/zsh - is what it looks like
 	file, err := os.Open("/etc/passwd")
@@ -115,8 +121,14 @@ func get_user() string {
 	return name
 }
 
-func verify_pass() bool {
-	name = get_user()
+func verify_pass(password string, uid int) (bool, error) {
+	var token string
+	UID := fmt.Sprintf("%d", uid)
+	name, err := user.LookupId(UID)
+	if err != nil {
+		return false, err
+	}
+
 	// open etc shadow and find the users hash - name:$6$reallylonghash:12345:0:99999:7:::
 	fi, err := os.Open("/etc/shadow")
 	if err != nil {
@@ -124,11 +136,11 @@ func verify_pass() bool {
 	}
 
 	defer fi.Close()
-	scanner1 := bufio.NewScanner(fi)
+	scanner := bufio.NewScanner(fi)
 
-	for scanner1.Scan() {
-		if strings.Contains(scanner1.Text(), name) {
-			token = scanner1.Text()
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), name.Name) {
+			token = scanner.Text()
 		}
 	}
 
@@ -141,13 +153,15 @@ func verify_pass() bool {
 	crypt := crypt.SHA512.New()
 	err = crypt.Verify(token, []byte(password))
 	if err != nil {
-		return false
+		return false, err
 	} else {
-		return true
+		return true, nil
 	}
 }
 
 func main() {
+	userID := syscall.Getuid()
+
 	// get effective user ID and set to root user
 	err := syscall.Setuid(0)
 	if err != nil {
@@ -155,18 +169,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	// if timeout() {
-	// 	askpass()
-	// 	if verify_pass() {
-	// 		reset_modtime()
-	// 	} else {
-	// 		fmt.Println("Incorrect password")
-	// 		os.Exit(1)
-	// 	}
-	// }
+	pass, err := askpass()
+	if err != nil {
+		fmt.Println(err)
+	}
 
-	askpass()
-	if verify_pass() != true {
+	passed, err := verify_pass(pass, userID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if !passed {
 		fmt.Fprintln(os.Stderr, "Incorrect password")
 		os.Exit(1)
 	}

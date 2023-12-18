@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -14,6 +15,7 @@ import (
 var opts struct {
 	Regex      []string `short:"r" long:"regex" description:"use regex to match filenames"`
 	Extensions []string `short:"e" long:"extension" description:"use regex to match filenames"`
+	Names      []string `short:"n" long:"name" description:"use file globbing to match filenames (follows shell patterns)"`
 	Root       string   `short:"R" long:"root" description:"set root directory to start searching from"`
 	Relative   bool     `long:"relative" description:"print file names as paths relative to root directory"`
 	Absolute   bool     `short:"a" long:"absolute" description:"print absolute file paths"`
@@ -42,8 +44,9 @@ type File struct {
 }
 
 var (
-	MatchPattern bool
-	MatchRegex   bool
+	MatchName  bool
+	MatchRegex bool
+	MatchExt   bool
 )
 
 func matchRegex(str string, patterns []string) (bool, error) {
@@ -53,6 +56,35 @@ func matchRegex(str string, patterns []string) (bool, error) {
 		if r.Match([]byte(str)) {
 			return true, nil
 		}
+	}
+	return false, errSkip
+}
+
+func matchExt(str string, extensions []string) (bool, error) {
+	Debug("file: %v Pattern: %v\n", str, extensions)
+
+	for _, e := range extensions {
+		if e == "" {
+			continue
+		}
+		var mr string
+		if strings.HasPrefix(e, ".") {
+			mr = fmt.Sprintf(".*\\%s$", e)
+		} else {
+			mr = fmt.Sprintf(".*\\.%s$", e)
+		}
+		r := regexp.MustCompile(mr)
+		if r.Match([]byte(str)) {
+			return true, nil
+		}
+	}
+
+	return false, errSkip
+}
+
+func matchGlob(str string, globs []string) (bool, error) {
+	for _, p := range globs {
+		return Glob(p, str), nil
 	}
 	return false, errSkip
 }
@@ -70,6 +102,24 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 
 	if MatchRegex {
 		m, err := matchRegex(path, opts.Regex)
+		if err != nil {
+		}
+		if m {
+			fmt.Println(path)
+		}
+	}
+
+	if MatchExt {
+		m, err := matchExt(path, opts.Extensions)
+		if err != nil {
+		}
+		if m {
+			fmt.Println(path)
+		}
+	}
+
+	if MatchName {
+		m, err := matchGlob(path, opts.Names)
 		if err != nil {
 		}
 		if m {
@@ -104,6 +154,12 @@ func main() {
 
 	if len(opts.Regex) != 0 {
 		MatchRegex = true
+	}
+	if len(opts.Extensions) != 0 {
+		MatchExt = true
+	}
+	if len(opts.Names) != 0 {
+		MatchName = true
 	}
 
 	if opts.Absolute && opts.Relative {

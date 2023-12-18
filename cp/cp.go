@@ -185,8 +185,10 @@ func Copy(args []string) error {
 
 		if opts.Recursive {
 			// recursive copy func
+			lastErr = copyTree(file, dest)
 		} else {
 			// normal copy func
+			lastErr = copyPrep(file, dest)
 		}
 	}
 

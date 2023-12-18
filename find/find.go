@@ -90,7 +90,6 @@ func matchGlob(str string, globs []string) (bool, error) {
 }
 
 func walkFunc(path string, info os.FileInfo, err error) error {
-	// fmt.Println(path)
 	if opts.Absolute {
 		path = filepath.Join(opts.Root, path)
 	}
@@ -103,6 +102,9 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 	if MatchRegex {
 		m, err := matchRegex(path, opts.Regex)
 		if err != nil {
+			if err == errSkip {
+				Debug("Skip: %v\n", path)
+			}
 		}
 		if m {
 			fmt.Println(path)
@@ -112,6 +114,9 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 	if MatchExt {
 		m, err := matchExt(path, opts.Extensions)
 		if err != nil {
+			if err == errSkip {
+				Debug("Skip: %v\n", path)
+			}
 		}
 		if m {
 			fmt.Println(path)
@@ -121,11 +126,19 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 	if MatchName {
 		m, err := matchGlob(path, opts.Names)
 		if err != nil {
+			if err == errSkip {
+				Debug("Skip: %v\n", path)
+			}
 		}
 		if m {
 			fmt.Println(path)
 		}
 	}
+
+	if !MatchExt && !MatchName && !MatchRegex {
+		fmt.Println(path)
+	}
+
 	return nil
 }
 
@@ -171,6 +184,10 @@ func main() {
 	}
 
 	CWD, _ = os.Getwd()
+
+	if opts.Root == "" {
+		opts.Root = CWD
+	}
 
 	if err := Find(args); err != nil {
 		log.Fatal(err)

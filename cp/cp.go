@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -21,8 +23,125 @@ var opts struct {
 }
 
 var Debug = func(string, ...interface{}) {}
+var errSkip = errors.New("skip")
 
-func confirmOverwrite(dest string, input *bufio.Reader) (bool, error) {
+func stat(path string) (os.FileInfo, error) {
+	if opts.noFollowSymlinks {
+		return os.Lstat(path)
+	}
+	return os.Stat(path)
+}
+
+func copyRegularFile(src, dest string, srcInfo os.FileInfo) error {
+	srcf, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer srcf.Close()
+
+	destfile, err := os.OpenFile(dest, os.O_RDWR|os.O_CREATE|os.O_TRUNC, srcInfo.Mode().Perm())
+	if err != nil {
+		return err
+	}
+	defer destfile.Close()
+
+	_, err = io.Copy(destfile, srcf)
+	return err
+}
+
+func copyFile(src, dest string, srcInfo os.FileInfo) error {
+	m := srcInfo.Mode()
+	switch {
+	case m.IsDir():
+		return os.MkdirAll(dest, srcInfo.Mode().Perm())
+	case m.IsRegular():
+		return copyRegularFile(src, dest, srcInfo)
+	case m&os.ModeSymlink == os.ModeSymlink:
+		target, err := os.Readlink(src)
+		if err != nil {
+			return err
+		}
+		return os.Symlink(target, dest)
+
+	default:
+		return &os.PathError{
+			Op:   "copy",
+			Path: src,
+			Err:  fmt.Errorf("unsupported file mode %s", m),
+		}
+	}
+}
+
+func copyPrep(src, dest string) error {
+	srcInfo, err := stat(src)
+	if err != nil {
+		return err
+	}
+
+	if err := checkPreOperation(src, dest, srcInfo); err == errSkip {
+		return nil
+	} else if err != nil {
+		return err
+	}
+
+	if err := copyFile(src, dest, srcInfo); err != nil {
+		return err
+	}
+
+	if opts.Verbose {
+		Debug("%v => %v\n", src, dest)
+	}
+
+	return nil
+}
+
+func copyTree(src, dest string) error {
+	return filepath.Walk(src, func(path string, fi os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(src, path)
+		if err != nil {
+			return err
+		}
+		return copyPrep(path, filepath.Join(dest, rel))
+	})
+}
+
+func checkPreOperation(src, dest string, srcinfo os.FileInfo) error {
+	if !opts.Recursive && srcinfo.IsDir() {
+		fmt.Printf("cp: -r not specified, omitting directory %s\n", src)
+		return errSkip
+	}
+
+	destInfo, err := os.Stat(dest)
+	if err != nil && !os.IsNotExist(err) {
+		fmt.Printf("cp: %v: cant handle error %v\n", dest, err)
+		return errSkip
+	} else if err != nil {
+		return nil
+	}
+
+	if os.SameFile(srcinfo, destInfo) {
+		fmt.Printf("cp: %v and %v are the same file\n", src, dest)
+		return errSkip
+	}
+
+	if opts.Ask && !opts.Force {
+		overwrite, err := confirmOverwrite(dest)
+		if err != nil {
+			return err
+		}
+
+		if !overwrite {
+			return errSkip
+		}
+	}
+	return nil
+}
+
+func confirmOverwrite(dest string) (bool, error) {
+	input := bufio.NewReader(os.Stdin)
 	fmt.Printf("cp: overwrite %v? ", dest)
 	answer, err := input.ReadString('\n')
 	if err != nil {

@@ -117,9 +117,14 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 	var printOut bool
 	printOut = false
 
+	var proot, ppath string
 	if opts.Color {
-		opts.Root = fmt.Sprintf("\x1b[38;2;89;182;227m%s\x1b[0m", opts.Root)
-		path = fmt.Sprintf("\x1b[38;2;219;88;100%s\x1b[0m", path)
+		end := filepath.Base(path)
+		beg := filepath.Dir(path)
+		beg = fmt.Sprintf("%s/%s", opts.Root, beg)
+
+		ppath = fmt.Sprintf("\x1b[38;2;219;88;100m%s\x1b[0m", end)
+		proot = fmt.Sprintf("\x1b[38;2;89;182;227m%s/\x1b[0m", beg)
 	}
 
 	if opts.Absolute {
@@ -173,7 +178,11 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 	}
 
 	if printOut {
-		fmt.Println(path)
+		if opts.Color {
+			fmt.Printf("%s%s\n", proot, ppath)
+		} else {
+			fmt.Println(path)
+		}
 	}
 
 	return nil

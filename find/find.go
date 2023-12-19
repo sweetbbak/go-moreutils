@@ -20,6 +20,7 @@ var opts struct {
 	Root       string   `short:"R" long:"root" description:"set root directory to start searching from"`
 	Relative   bool     `long:"relative" description:"print file names as paths relative to root directory"`
 	Absolute   bool     `short:"a" long:"absolute" description:"print absolute file paths"`
+	Color      bool     `short:"c" long:"color" description:"print paths with color"`
 	Verbose    bool     `short:"v" long:"verbose" description:"print debugging information and verbose output"`
 }
 
@@ -116,6 +117,11 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 	var printOut bool
 	printOut = false
 
+	if opts.Color {
+		opts.Root = fmt.Sprintf("\x1b[38;2;89;182;227m%s\x1b[0m", opts.Root)
+		path = fmt.Sprintf("\x1b[38;2;219;88;100%s\x1b[0m", path)
+	}
+
 	if opts.Absolute {
 		path = filepath.Join(opts.Root, path)
 	}
@@ -134,7 +140,6 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 		}
 		if m {
 			printOut = true
-			// fmt.Println(path)
 		}
 	}
 
@@ -147,7 +152,6 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 		}
 		if m {
 			printOut = true
-			// fmt.Println(path)
 		}
 	}
 
@@ -160,7 +164,6 @@ func walkFunc(path string, info os.FileInfo, err error) error {
 		}
 		if m {
 			printOut = true
-			// fmt.Println(path)
 		}
 	}
 

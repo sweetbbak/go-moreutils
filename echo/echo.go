@@ -18,12 +18,14 @@ var (
 	specialFormatter          bool = false
 )
 
-var usage = `USAGE:
-echo <options> [strings]...
-		-e    interpret escape sequences
-		-n    suppress newlines
-		-E    disable interpretation of backslash sequences
-		-f    use special formatting replacement strings for hex colors "{#1e1e1e}Hello{clear}"
+var usage = `echo <options> [strings]...
+Usage:
+	-e    interpret escape sequences
+	-n    suppress newlines
+	-E    disable interpretation of backslash sequences
+	-f    use special formatting replacement strings for hex colors "{#1e1e1e}Hello{clear}"
+Examples:
+	echo -f "{#ff11aa}Hello{clear}{#DDD123}World{clear}\n\t:)"
 `
 
 func escapeStr(s string) (string, error) {

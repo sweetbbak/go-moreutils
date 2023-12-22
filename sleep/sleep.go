@@ -129,7 +129,7 @@ func Eepy(args []string) error {
 }
 
 func looper(args []string) {
-	if opts.Loop == -1 {
+	if opts.Loop < 0 {
 		x := 0
 		for {
 			x += 1

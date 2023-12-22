@@ -1,5 +1,5 @@
-ARCH := amd64
-OS := linux
+# ARCH := amd64
+# OS := linux
 
 default:
     echo 'Hello, world!'

@@ -61,11 +61,17 @@ func gInfo(file *os.File) error {
 	if err != nil {
 		return err
 	}
-	ratio := bs / size
+	// ratio := (size * int64(100)) / bs
+	ratio := PercentOf(int(size), int(bs))
+	ratio = 100 - ratio
 
 	fmt.Printf("compressed\tuncompressed\tratio\tname\n")
-	fmt.Printf("%v %d %d %v\n", size, bs, ratio, dcmp.Name)
+	fmt.Printf("%v\t\t%v\t\t%.2f\t%v\n", size, bs, ratio, dcmp.Name)
 	return nil
+}
+
+func PercentOf(part int, total int) float64 {
+	return (float64(part) * float64(100)) / float64(total)
 }
 
 func unzip(file *os.File) error {

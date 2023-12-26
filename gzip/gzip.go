@@ -24,6 +24,16 @@ var opts struct {
 	Keep        bool   `short:"k" long:"keep" description:"keep the source GZIP archive"`
 	Stdout      bool   `short:"c" long:"stdout" description:"print decompressed contents to stdout"`
 	Verbose     bool   `short:"v" long:"verbose" description:"print debugging information and verbose output"`
+
+	One   bool `short:"1" hidden:"true" description:"compression level"`
+	Two   bool `short:"2" hidden:"true" description:"compression level"`
+	Three bool `short:"3" hidden:"true" description:"compression level"`
+	Four  bool `short:"4" hidden:"true" description:"compression level"`
+	Five  bool `short:"5" hidden:"true" description:"compression level"`
+	Six   bool `short:"6" hidden:"true" description:"compression level"`
+	Seven bool `short:"7" hidden:"true" description:"compression level"`
+	Eight bool `short:"8" hidden:"true" description:"compression level"`
+	Nine  bool `short:"9" hidden:"true" description:"compression level"`
 }
 
 var Debug = func(string, ...interface{}) {}
@@ -47,6 +57,10 @@ func unzip(file *os.File) error {
 		outfile, err = newName(file.Name())
 		if err != nil {
 			return err
+		}
+
+		if opts.Suffix != "" {
+			outfile = outfile + opts.Suffix
 		}
 	} else {
 		if opts.Suffix != "" {
@@ -217,6 +231,36 @@ func compressionLevel(args []string) int {
 	return 6
 }
 
+func compLevel() {
+	if opts.One {
+		opts.CompressLvl = 1
+	}
+	if opts.Two {
+		opts.CompressLvl = 2
+	}
+	if opts.Three {
+		opts.CompressLvl = 3
+	}
+	if opts.Four {
+		opts.CompressLvl = 4
+	}
+	if opts.Five {
+		opts.CompressLvl = 5
+	}
+	if opts.Six {
+		opts.CompressLvl = 6
+	}
+	if opts.Seven {
+		opts.CompressLvl = 7
+	}
+	if opts.Eight {
+		opts.CompressLvl = 8
+	}
+	if opts.Nine {
+		opts.CompressLvl = 9
+	}
+}
+
 func main() {
 	opts.Procs = 0
 	opts.CompressLvl = 6
@@ -238,6 +282,8 @@ func main() {
 		Debug = log.Printf
 	}
 
+	// process short opts -9 etc, then verify compression level is [1-9]. if err return 6 as default
+	compLevel()
 	opts.CompressLvl = compressionLevel(args)
 
 	if err := Gzip(args); err != nil {

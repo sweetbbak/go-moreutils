@@ -13,14 +13,38 @@ import (
 )
 
 var opts struct {
-	List    bool `short:"l" long:"list" description:"list information about the gzip archive"`
-	Keep    bool `short:"k" long:"keep" description:"keep the source GZIP archive"`
-	Force   bool `short:"f" long:"force" description:"force overwrite existing files if they exist"`
-	Stdout  bool `short:"s" long:"stdout" description:"print decompressed contents to stdout"`
-	Verbose bool `short:"v" long:"verbose" description:"print debugging information and verbose output"`
+	List     bool `short:"l" long:"list" description:"list information about the gzip archive"`
+	Keep     bool `short:"k" long:"keep" description:"keep the source GZIP archive"`
+	Force    bool `short:"f" long:"force" description:"force overwrite existing files if they exist"`
+	Stdout   bool `short:"s" long:"stdout" description:"print decompressed contents to stdout"`
+	Examples bool `short:"H" long:"examples" description:"print a few examples of uses"`
+	Verbose  bool `short:"v" long:"verbose" description:"print debugging information and verbose output"`
 }
 
 var Debug = func(string, ...interface{}) {}
+
+func printExamples() {
+	fmt.Println("\x1b[32mgunzip\x1b[0m")
+	fmt.Println("")
+	fmt.Println("\x1b[33mExtract file(s) from a gzip (.gz) archive.\x1b[0m")
+	fmt.Println("\x1b[33mMore information: https://manned.org/gunzip.\x1b[0m")
+	fmt.Println("")
+	fmt.Println("\x1b[32m- Extract a file from an archive, replacing the original file if it exists:\x1b[0m")
+	fmt.Println("\x1b[31mgunzip archive.tar.gz\x1b[0m")
+	fmt.Println("")
+	fmt.Println("\x1b[32m- Extract a file to a target destination:\x1b[0m")
+	fmt.Println("\x1b[31mgunzip --stdout archive.tar.gz > archive.tar\x1b[0m")
+	fmt.Println("")
+	fmt.Println("\x1b[32m- Extract a file and keep the archive file:\x1b[0m")
+	fmt.Println("\x1b[31mgunzip --keep archive.tar.gz\x1b[0m")
+	fmt.Println("")
+	fmt.Println("\x1b[32m- List the contents of a compressed file:\x1b[0m")
+	fmt.Println("\x1b[31mgunzip --list file.txt.gz\x1b[0m")
+	fmt.Println("")
+	fmt.Println("\x1b[32m- Decompress an archive from `stdin`:\x1b[0m")
+	fmt.Println("\x1b[31mcat path/to/archive.gz | gunzip > archive\x1b[0m")
+	os.Exit(1)
+}
 
 func Gunzip(args []string) error {
 	if isOpen(os.Stdin) && len(args) == 0 {
@@ -81,7 +105,7 @@ func gInfo(file *os.File) error {
 	ratio = 100 - ratio
 
 	fmt.Printf("compressed\tuncompressed\tratio\tname\n")
-	fmt.Printf("%v\t\t%v\t\t%.2f\t%v\n", size, bs, ratio, dcmp.Name)
+	fmt.Printf("%v\t\t%v\t\t%.2f\t%v\n", size, bs, ratio, file.Name())
 	return nil
 }
 
@@ -137,9 +161,21 @@ func unzip(file *os.File) error {
 
 	// as per GNU open-time flags, create + excl will never overwrite an existing file
 	// we also copy the OG files mode and all that
-	out, err := os.OpenFile(outfile, os.O_WRONLY|os.O_CREATE|os.O_EXCL, fi.Mode())
-	if err != nil {
-		return err
+	var creation int
+	if opts.Force {
+		creation = os.O_WRONLY | os.O_CREATE
+	} else {
+		creation = os.O_WRONLY | os.O_CREATE | os.O_EXCL
+	}
+
+	var out *os.File
+	if opts.Stdout {
+		out = os.Stdout
+	} else {
+		out, err = os.OpenFile(outfile, creation, fi.Mode())
+		if err != nil {
+			return err
+		}
 	}
 	defer out.Close()
 
@@ -158,6 +194,10 @@ func main() {
 	args, err := flags.Parse(&opts)
 	if err != nil {
 		os.Exit(0)
+	}
+
+	if opts.Examples {
+		printExamples()
 	}
 
 	if opts.Verbose {

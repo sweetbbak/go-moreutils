@@ -66,7 +66,7 @@ func gInfo(file *os.File) error {
 	ratio = 100 - ratio
 
 	fmt.Printf("compressed\tuncompressed\tratio\tname\n")
-	fmt.Printf("%v\t\t%v\t\t%.2f\t%v\n", size, bs, ratio, dcmp.Name)
+	fmt.Printf("%v\t\t%v\t\t%.2f\t%v\n", size, bs, ratio, file.Name())
 	return nil
 }
 

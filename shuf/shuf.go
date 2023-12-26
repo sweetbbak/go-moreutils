@@ -2,10 +2,12 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"log"
 	"math/rand"
 	"os"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -61,30 +63,40 @@ func randomShuf(file *os.File) error {
 		if opts.Count > len(lines) {
 			opts.Count = len(lines)
 		}
-		lines = lines[:opts.Count]
-		Debug("%v\n", lines)
+		// lines = lines[:opts.Count]
 	}
 
 	if !opts.Repeat {
 		m := make(map[string]bool)
 		for _, x := range lines {
 			m[string(x)] = false
-			Debug("%v\n", m)
 		}
 
 		if opts.Count == 0 {
 			opts.Count = len(m) - 1
 		}
 
-		var idx int
+		var idx int = 0
+		var printCount int = 0
 		for k := range m {
-			if idx > opts.Count {
+			if printCount == opts.Count {
 				break
 			}
 
+			// check if our string -> bool map has been printed yet, if not flip the str to true and print
 			exists := m[k]
 			if !exists {
-				fmt.Fprintf(f, "%s%s", k, delim)
+				if !opts.NonEmpty {
+					if k != "" && k != "\n" && len(strings.TrimSpace(k)) != 0 {
+						fmt.Fprintf(f, "%s%s", k, delim)
+						printCount++
+					} else {
+						continue
+					}
+				} else {
+					fmt.Fprintf(f, "%s%s", k, delim)
+					printCount++
+				}
 				m[k] = true
 			}
 			idx++
@@ -92,8 +104,26 @@ func randomShuf(file *os.File) error {
 	}
 
 	if opts.Repeat {
+		var idx int = 0
+		var printCount int = 0
 		for _, line := range lines {
-			fmt.Fprintf(f, "%s%s", line, delim)
+			// if idx >= opts.Count && printCount == opts.Count {
+			if printCount == opts.Count {
+				break
+			}
+
+			if !opts.NonEmpty {
+				if line != nil && len(bytes.TrimSpace(line)) != 0 {
+					fmt.Fprintf(f, "%s%s", line, delim)
+					Debug("%x\n", line)
+					printCount++
+				}
+			} else {
+				Debug("%d\n", line)
+				fmt.Fprintf(f, "%s%s", line, delim)
+				printCount++
+			}
+			idx++
 		}
 	}
 	return nil
@@ -109,8 +139,6 @@ func isatty() bool {
 }
 
 func Shuf(args []string) error {
-	Debug("%v\n", args)
-
 	if !isatty() {
 		Debug("STDIN is open\n")
 		randomShuf(os.Stdin)
@@ -130,8 +158,13 @@ func Shuf(args []string) error {
 
 func main() {
 	args, err := flags.Parse(&opts)
-	if err != nil {
+	if flags.WroteHelp(err) || err == flags.ErrHelp {
 		os.Exit(0)
+	}
+
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
 	}
 
 	if opts.Verbose {

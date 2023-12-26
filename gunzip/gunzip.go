@@ -55,6 +55,7 @@ func Gunzip(args []string) error {
 	}
 
 	for _, file := range args {
+		file = os.ExpandEnv(file)
 		f, err := os.Open(file)
 		if err != nil {
 			return err

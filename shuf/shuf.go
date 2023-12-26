@@ -63,6 +63,8 @@ func randomShuf(file *os.File) error {
 		if opts.Count > len(lines) {
 			opts.Count = len(lines)
 		}
+		// this was a "simple" way to only print N amount of lines
+		// but it falls apart with non-repeats and no empty lines
 		// lines = lines[:opts.Count]
 	}
 
@@ -76,7 +78,6 @@ func randomShuf(file *os.File) error {
 			opts.Count = len(m) - 1
 		}
 
-		var idx int = 0
 		var printCount int = 0
 		for k := range m {
 			if printCount == opts.Count {
@@ -99,15 +100,12 @@ func randomShuf(file *os.File) error {
 				}
 				m[k] = true
 			}
-			idx++
 		}
 	}
 
 	if opts.Repeat {
-		var idx int = 0
 		var printCount int = 0
 		for _, line := range lines {
-			// if idx >= opts.Count && printCount == opts.Count {
 			if printCount == opts.Count {
 				break
 			}
@@ -123,7 +121,6 @@ func randomShuf(file *os.File) error {
 				fmt.Fprintf(f, "%s%s", line, delim)
 				printCount++
 			}
-			idx++
 		}
 	}
 	return nil

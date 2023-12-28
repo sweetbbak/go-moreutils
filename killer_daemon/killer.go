@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -9,6 +8,8 @@ import (
 	"strings"
 	"syscall"
 	"time"
+
+	"github.com/jessevdk/go-flags"
 )
 
 var (
@@ -23,15 +24,10 @@ Examples:
 	killer -c "start-as=fullscreen"
 	`
 
-func init() {
-	flag.StringVar(&File, "f", "", "path to a file with a list of process names to block")
-	flag.StringVar(&File, "file", "", "path to a file with a list of process names to block")
-
-	flag.BoolVar(&Regex, "r", false, "use a substring to match process names")
-	flag.BoolVar(&Regex, "rough", false, "use a substring to match process names")
-
-	flag.BoolVar(&Cmd, "c", false, "match args used for a process")
-	flag.BoolVar(&Cmd, "cmd", false, "match args used for a process")
+var opts struct {
+	File    string `short:"f" long:"file" description:"path to a file with a list of process names to block"`
+	Regex   bool   `short:"r" long:"regex" description:"match processes using a matching substring"`
+	Command bool   `short:"c" long:"command" description:"match command arguments used for a process"`
 }
 
 // get list of all processes
@@ -47,14 +43,14 @@ func getProcs() ([]Process, error) {
 func ProcessPid(arg string, p []Process) ([]Process, error) {
 	var matches []Process
 	for _, proc := range p {
-		if Regex {
+		if opts.Regex {
 			if strings.Contains(proc.Executable(), arg) {
 				fmt.Printf("Found match: %v of [PID] %v\n", proc.Executable(), proc.Pid())
 				matches = append(matches, proc)
 			}
 		}
 
-		if Cmd {
+		if opts.Command {
 			cmdargs, err := Cmdline(proc.Pid())
 			if err != nil {
 				continue
@@ -68,7 +64,7 @@ func ProcessPid(arg string, p []Process) ([]Process, error) {
 			}
 		}
 
-		if !Cmd && !Regex {
+		if !opts.Command && !opts.Regex {
 			if proc.Executable() == arg {
 				fmt.Printf("Found match: %v of [PID] %v\n", proc.Executable(), proc.Pid())
 				matches = append(matches, proc)
@@ -127,7 +123,13 @@ func handleKillSignal() {
 }
 
 func main() {
-	flag.Parse()
+	args, err := flags.Parse(&opts)
+	if flags.WroteHelp(err) {
+		os.Exit(0)
+	}
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// handle signals and exit
 	handleKillSignal()
@@ -135,7 +137,7 @@ func main() {
 	// loop in the background while looking for procs to kill
 	for {
 		time.Sleep(1 * time.Second)
-		if err := WatchDog(flag.Args()); err != nil {
+		if err := WatchDog(args); err != nil {
 			log.Println(err)
 		}
 	}

@@ -10,6 +10,7 @@ import (
 	"log"
 	"math/rand"
 	"os"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -20,6 +21,7 @@ var opts struct {
 	Unlink   bool   `short:"u" long:"remove" description:"unlink/remove a file after renaming it"`
 	Passes   int64  `short:"n" long:"iterations" default:"3" description:"number of passes"`
 	Force    bool   `short:"f" long:"force" description:"change file permissions to allow writing"`
+	Quiet    bool   `short:"q" long:"quiet" description:"dont print any output"`
 	Secure   bool   `short:"s" long:"secure" description:"use random bytes that are genuinely more random"`
 	Zero     bool   `short:"z" long:"zero" description:"add a final overwrite with zeros to hide shredding"`
 	RandFile string `long:"random-source" description:"get random bytes from FILE (no-op for now)"`
@@ -41,7 +43,7 @@ const (
 
 var Debug = func(string, ...interface{}) {}
 
-func shredFile(f *os.File, fi fs.FileInfo) error {
+func shredFile(f *os.File, fi fs.FileInfo, bytesWritten *int64) error {
 	var r io.Reader
 
 	if opts.Secure {
@@ -53,18 +55,34 @@ func shredFile(f *os.File, fi fs.FileInfo) error {
 	wr := bufio.NewWriter(f)
 	buf := make([]byte, defualtBufSize)
 
+	// var bytesWritten int64
+	// progress := New(os.Stderr, "xfer", &bytesWritten)
+	// progress.Begin()
+
 	// write data in blocks of 4096 until we reach the end and then we seek to the end of the file.
 	for sizeLeft := fi.Size(); sizeLeft > 0; sizeLeft -= defualtBufSize {
 		if sizeLeft < defualtBufSize {
 			buf = make([]byte, sizeLeft)
 		}
 		r.Read(buf)
-		wr.Write(buf)
+		nn, err := wr.Write(buf)
+		if err != nil {
+			if err == io.EOF {
+				continue
+			}
+			return err
+		}
+
+		if !opts.Quiet {
+			atomic.AddInt64(bytesWritten, int64(nn))
+		}
 	}
+
+	// progress.End()
 
 	wr.Flush()
 	f.Sync()
-	f.Close()
+	// f.Close()
 	return nil
 }
 
@@ -77,7 +95,6 @@ func zeroFile(f *os.File, fi fs.FileInfo) error {
 	for sizeLeft := fi.Size(); sizeLeft > 0; sizeLeft -= defualtBufSize {
 		if sizeLeft < defualtBufSize {
 			buf = bytes.Repeat([]byte{0x00}, int(sizeLeft))
-			// buf = make([]byte, sizeLeft)
 		}
 		wr.Write(buf)
 	}
@@ -110,7 +127,7 @@ func renameFile(filename string) error {
 
 func Shred(args []string) error {
 	for _, file := range args {
-		Debug("shred: Begin shredding file: %v\n", file)
+		Debug("%s[INFO]%s Begin shredding file: %s%v%s\n", GREEN, CLR, ITALIC, file, CLR)
 		fi, err := os.Stat(file)
 		if err != nil {
 			return err
@@ -123,10 +140,10 @@ func Shred(args []string) error {
 		f, err := os.OpenFile(file, os.O_WRONLY, 0o660)
 		if err != nil {
 			if os.IsPermission(err) {
-				Debug("shred: %v\n", err)
+				Debug("%s[ERR]%s shred: %v\n", RED, CLR, err)
 				if opts.Force {
 					if err := os.Chmod(file, fi.Mode()|syscall.S_IWUSR); err != nil {
-						Debug("shred: %v\n", err)
+						Debug("%s[ERR]%s shred: %v\n", RED, CLR, err)
 						return err
 					}
 				}
@@ -139,9 +156,21 @@ func Shred(args []string) error {
 			return fmt.Errorf("Passes cannot be negative.")
 		}
 
+		var bytesWritten int64 = 0
 		for i := int64(0); i < int64(opts.Passes); i++ {
-			Debug("shred: shredding %v: pass %v\n", file, i+1)
-			shredFile(f, fi)
+			Debug("%s[INFO]%s shred: shredding %v: pass %s%v%s\n", GREEN, CLR, file, BOLD, i+1, CLR)
+
+			progress := New(os.Stderr, "progress", &bytesWritten)
+			progress.Begin()
+
+			f, err := os.OpenFile(file, os.O_WRONLY, 0o660)
+			if err != nil {
+				return err
+			}
+			shredFile(f, fi, &bytesWritten)
+			f.Close()
+
+			progress.End()
 		}
 
 		if opts.Zero {
@@ -149,13 +178,13 @@ func Shred(args []string) error {
 			if err != nil {
 				return err
 			}
-			Debug("shred: zeroing file %v\n", file)
+			Debug("%s[INFO]%s shred: %szeroing%s %v\n", GREEN, CLR, ITALIC, CLR, file)
 			zeroFile(f, fi)
 			f.Close()
 		}
 
 		if opts.Unlink {
-			Debug("shred: removing file %v\n", file)
+			Debug("%s[INFO]%s shred: %sremoving%s %v\n", GREEN, CLR, ITALIC, CLR, file)
 			renameFile(f.Name())
 		}
 	}

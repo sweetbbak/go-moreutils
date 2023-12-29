@@ -13,6 +13,7 @@ require (
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/kdomanski/iso9660 v0.4.0
 	github.com/klauspost/pgzip v1.2.6
+	github.com/mattn/go-isatty v0.0.20
 	github.com/ogier/pflag v0.0.1
 	github.com/pkg/term v1.1.0
 	github.com/rck/unit v0.0.3

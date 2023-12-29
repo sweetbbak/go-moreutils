@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -18,6 +20,22 @@ var opts struct {
 var Debug = func(string, ...interface{}) {}
 
 func Factor(args []string) error {
+	// if 0 arguments and stdin is a pipe append those numbers to args
+	if len(args) == 0 && isOpen() {
+		sc := bufio.NewScanner(os.Stdin)
+		for sc.Scan() {
+			line := sc.Text()
+			if strings.Contains(line, " ") {
+				ll := strings.Split(line, " ")
+				for _, subarg := range ll {
+					args = append(args, subarg)
+				}
+			} else {
+				args = append(args, line)
+			}
+		}
+	}
+
 	if len(args) == 0 {
 		return interactiveMode()
 	}
@@ -35,19 +53,23 @@ func Factor(args []string) error {
 	return nil
 }
 
-func calculateFactors(n int) []int {
+func calculateFactors(number int) []int {
 	var factors []int
-	for i := 2; i <= n; i += 2 {
-		if n%n == 0 {
-			factors = append(factors, i)
-			n /= i // its the += of division lol
-			i = 0
-		} else if i*i > n {
-			factors = append(factors, i)
+	for index := 2; index <= number; index += 2 {
+		if number%index == 0 {
+			factors = append(factors, index)
+			number /= index
+			index = 0
+		} else if index*index > number {
+			factors = append(factors, number)
+			break
+		} else if index*index == number {
+			factors = append(factors, index)
+			factors = append(factors, index)
 			break
 		}
-		if i == 2 {
-			i = 1
+		if index == 2 {
+			index = 1
 		}
 	}
 	return factors
@@ -66,6 +88,7 @@ func handleSigs() {
 	signal.Notify(c, os.Interrupt)
 	go func() {
 		<-c
+		fmt.Println()
 		fmt.Println("Goodbye!")
 		os.Exit(0)
 	}()
@@ -73,13 +96,34 @@ func handleSigs() {
 
 func interactiveMode() error {
 	var number int
+	var a string
 	go handleSigs()
 
 	fmt.Println("input number: ")
 	for {
-		fmt.Scan(&number)
+		var err error
+
+		fmt.Scan(&a)
+		if a == "exit" {
+			os.Exit(0)
+		}
+
+		number, err = convNumber(a)
+		if err != nil {
+			fmt.Println("Invalid number")
+		}
+
 		factors := calculateFactors(number)
-		fmt.Printf("%d: %s\n", number, factorsString(&factors))
+		fmt.Printf("%d:%s\n", number, factorsString(&factors))
+	}
+}
+
+func isOpen() bool {
+	stat, _ := os.Stdin.Stat()
+	if stat.Mode()&os.ModeCharDevice == os.ModeCharDevice {
+		return false
+	} else {
+		return true
 	}
 }
 

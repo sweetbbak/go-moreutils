@@ -137,9 +137,6 @@ func pathExists(file string) bool {
 	return (err == nil)
 }
 
-func init() {
-}
-
 func main() {
 	args, err := flags.Parse(&opts)
 	if err != nil {

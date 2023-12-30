@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/jessevdk/go-flags"
 )
@@ -12,6 +13,7 @@ import (
 var opts struct {
 	Width     int    `short:"w" long:"width" description:"width of line numbers"`
 	Separator string `short:"s" long:"separator" description:"use string as a separator"`
+	Space     bool   `short:"c" long:"count-space" description:"also count empty lines"`
 	Verbose   bool   `short:"v" long:"verbose" description:"print debugging information and verbose output"`
 }
 
@@ -21,8 +23,19 @@ func nl(file *os.File, start int, width int, sep string) (int, error) {
 	sc := bufio.NewScanner(file)
 	n := start
 	for sc.Scan() {
-		fmt.Printf("%*d%s %s\n", width, n, sep, sc.Text())
-		n++
+		line := sc.Text()
+
+		if line == "" || line == "\n" || strings.TrimSpace(line) == "" {
+			if opts.Space {
+				fmt.Printf("%*d%s%s\n", width, n, sep, line)
+				n++
+			} else {
+				fmt.Printf("%s\n", line)
+			}
+		} else {
+			fmt.Printf("%*d%s%s\n", width, n, sep, line)
+			n++
+		}
 	}
 
 	if err := sc.Err(); err != nil {

@@ -6,6 +6,7 @@ require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/cenkalti/backoff/v4 v4.2.1
+	github.com/cyphar/filepath-securejoin v0.2.4
 	github.com/diskfs/go-diskfs v1.4.0
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gdamore/tcell/v2 v2.7.0
@@ -19,6 +20,7 @@ require (
 	github.com/pkg/term v1.1.0
 	github.com/rck/unit v0.0.3
 	github.com/seccomp/libseccomp-golang v0.10.0
+	github.com/sergi/go-diff v1.1.0
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sys v0.15.0
 	golang.org/x/term v0.15.0
@@ -32,7 +34,6 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/cloudflare/circl v1.3.3 // indirect
-	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/elliotwutingfeng/asciiset v0.0.0-20230602022725-51bbb787efab // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/gdamore/encoding v1.0.0 // indirect
@@ -49,7 +50,6 @@ require (
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/xattr v0.4.9 // indirect
 	github.com/rivo/uniseg v0.4.3 // indirect
-	github.com/sergi/go-diff v1.1.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/skeema/knownhosts v1.2.0 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect

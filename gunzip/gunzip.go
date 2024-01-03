@@ -192,6 +192,8 @@ func unzip(file *os.File) error {
 }
 
 func main() {
+	// p := flags.NewParser(&opts, flags.Default)
+	// p.WriteManPage(os.Stdout)
 	args, err := flags.Parse(&opts)
 	if err != nil {
 		os.Exit(0)

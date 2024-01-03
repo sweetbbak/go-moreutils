@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -19,6 +20,18 @@ var opts struct {
 
 var Debug = func(string, ...interface{}) {}
 
+func removeDuplicate(strSlice []int) []int {
+	allKeys := make(map[int]bool)
+	list := []int{}
+	for _, item := range strSlice {
+		if _, value := allKeys[item]; !value {
+			allKeys[item] = true
+			list = append(list, item)
+		}
+	}
+	return list
+}
+
 func cuttup(file *os.File, fields *Fields) error {
 	delim := opts.Delim
 	if delim == "" {
@@ -26,56 +39,52 @@ func cuttup(file *os.File, fields *Fields) error {
 	}
 	index := 0
 
-	Debug("%v: fields: [%v] delimiter: [%v]\n", file.Name(), opts.Fields, delim)
+	Debug("%v: fields: [%v] delimiter: ['%v']\n", file.Name(), opts.Fields, delim)
+	const maxInt = 10000
 
 	sc := bufio.NewScanner(file)
 	for sc.Scan() {
 		line := sc.Text()
 		array := strings.Split(line, delim)
-		if len(array) == 0 {
+		if len(array) == 0 || len(array) == 1 {
 			continue
 		}
+
+		for _, x := range fields.Ranges {
+			start := x.i
+			end := x.r
+			if end < 0 {
+				end = len(array) - end
+			}
+			for x := start; x <= end; x++ {
+				fields.Field = append(fields.Field, x)
+			}
+		}
+
+		fields.Field = removeDuplicate(fields.Field)
+		slices.Sort(fields.Field)
 
 		seen := make(map[int]string)
 		for in, split := range array {
 			seen[in+1] = split // "cut" starts at 1 index and not 0 :O
 		}
 
-		// for in, item := range seen {
-		// 	fmt.Println(in, item)
-		// }
-
 		var sb strings.Builder
 		for _, f := range fields.Field {
+			if f < 0 {
+				f = len(array) - f
+			}
+
 			item, ok := seen[f]
 			if ok {
 				sb.WriteString(item)
 				sb.WriteString(" ")
 			}
 		}
-		fmt.Println(sb.String())
+		if sb.String() != "" {
+			fmt.Println(sb.String())
+		}
 		sb.Reset()
-
-		// maxx := len(array)
-		// for _, split := range array {
-		// 	for _, i := range fields.Field {
-		// 		if i > maxx {
-		// 			continue
-		// 		}
-
-		// 		if i >= 0 && i <= maxx {
-		// 			seen[split] = true
-		// 		}
-
-		// 		if i < 0 {
-		// 			ix := len(array) - i
-		// 			if ix >= 0 && ix <= maxx {
-
-		// 			}
-		// 		}
-		// 	}
-		// }
-
 		index++
 	}
 	return nil

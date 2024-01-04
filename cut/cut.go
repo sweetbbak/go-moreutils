@@ -124,7 +124,7 @@ func parseFields(rawFields string) (*Fields, error) {
 
 	for _, item := range f {
 		switch {
-		case strings.HasPrefix(item, "-"):
+		case strings.HasPrefix(item, "+"):
 			item = item[1:]
 			item, err := convertNum(item)
 			if err != nil {

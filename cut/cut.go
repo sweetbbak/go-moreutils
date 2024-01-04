@@ -191,8 +191,34 @@ func Cut(args []string) error {
 	return nil
 }
 
+func preprocessArgs() []string {
+	args := os.Args
+	for i, item := range args {
+		if item == "-f" || item == "--fields" {
+			if i+1 > len(args) {
+				return args
+			} else {
+				fields := args[i+1]
+				fi := strings.Split(fields, ",")
+				for f, a := range fi {
+					if strings.HasPrefix(a, "-") {
+						a, _ = strings.CutPrefix(a, "-")
+						a = "+" + a
+						fi[f] = a
+						x := strings.Join(fi, ",")
+						args[i+1] = x
+						return args
+					}
+				}
+			}
+		}
+	}
+	return args
+}
+
 func main() {
-	args, err := flags.Parse(&opts)
+	osargs := preprocessArgs()
+	args, err := flags.ParseArgs(&opts, osargs[1:])
 	if err != nil {
 		os.Exit(0)
 	}

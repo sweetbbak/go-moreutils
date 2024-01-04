@@ -11,7 +11,7 @@ import (
 
 var (
 	Chars = flag.Int64("c", 0, "read n number of bytes only")
-	Lines = flag.Int("n", 10, "read n number of bytes only")
+	Lines = flag.Int("n", 10, "read n number of lines only")
 	Quiet = flag.Bool("q", false, "read n number of bytes only")
 
 	passedChars bool

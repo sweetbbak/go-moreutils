@@ -24,7 +24,7 @@ cat example.txt | cut -d ' ' -f 9-33
 # print from the 5th field onwards
 cat example.txt | cut -d ' ' -f 5-
 # print from beginning to five fields
-cat example.txt | cut -d ' ' -f +5 # to be fixed, use '+' instead of a leading '-'
+cat example.txt | cut -d ' ' -f -5
 # print 1 2 3 4 5 6 and 11-19
 cat example.txt | cut -d ' ' -f 1,2,3,4,6,11-19
 # overlapping options will only print once (note that this is non-sensical)

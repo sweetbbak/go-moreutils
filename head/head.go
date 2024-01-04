@@ -10,9 +10,10 @@ import (
 )
 
 var (
-	Chars = flag.Int64("c", 0, "read n number of bytes only")
-	Lines = flag.Int("n", 10, "read n number of lines only")
-	Quiet = flag.Bool("q", false, "read n number of bytes only")
+	Chars   = flag.Int64("c", 0, "read N number of bytes only")
+	Lines   = flag.Int("n", 10, "read N number of lines only")
+	toLines = flag.Int("m", 1, "skip N number of lines")
+	Quiet   = flag.Bool("q", false, "read n number of bytes only")
 
 	passedChars bool
 	passedLines bool
@@ -30,6 +31,10 @@ func lineHead(f io.Reader, n int) error {
 	scanner := bufio.NewScanner(f)
 	line := 1
 	for scanner.Scan() {
+		if line < *toLines {
+			line++
+			continue
+		}
 		fmt.Println(scanner.Text())
 		if line >= n {
 			break

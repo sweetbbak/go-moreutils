@@ -83,7 +83,9 @@ func Cat(args []string) error {
 				continue
 			}
 			by, err := mycopy(os.Stdout, f)
-			if err != nil {
+			if err == io.EOF {
+				continue
+			} else if err != nil {
 				fmt.Fprintln(os.Stderr, err)
 			}
 			if opts.Verbose {
@@ -101,11 +103,12 @@ func Cat(args []string) error {
 
 func main() {
 	args, err := flags.Parse(&opts)
-	if err != nil {
-		if flags.WroteHelp(err) {
-			fmt.Println("")
-		}
+	if flags.WroteHelp(err) {
 		os.Exit(0)
+	}
+
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	if err := Cat(args); err != nil {

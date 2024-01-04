@@ -4,6 +4,7 @@ go 1.21.4
 
 require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
+	github.com/alessio/shellescape v1.4.2
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/cyphar/filepath-securejoin v0.2.4

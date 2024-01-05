@@ -18,11 +18,12 @@ require (
 	github.com/klauspost/pgzip v1.2.6
 	github.com/mattn/go-isatty v0.0.20
 	github.com/ogier/pflag v0.0.1
-	github.com/pkg/term v1.1.0
+	github.com/pkg/term v1.2.0-beta.2
 	github.com/rck/unit v0.0.3
 	github.com/seccomp/libseccomp-golang v0.10.0
 	github.com/sergi/go-diff v1.1.0
 	github.com/spf13/pflag v1.0.5
+	github.com/u-root/u-root v0.11.0
 	golang.org/x/sys v0.15.0
 	golang.org/x/term v0.15.0
 	golang.org/x/tools v0.13.0

@@ -35,6 +35,16 @@ func newDevnull() *Device {
 	return &Devnull
 }
 
+func newWatchDog() *Device {
+	var Devnull = Device{
+		Permission: defaultPerm,
+		DevType:    "c",
+		Major:      10,
+		Minor:      130,
+	}
+	return &Devnull
+}
+
 func parseDevices(args []string, devtype string) (int, error) {
 	if len(args) != 4 {
 		return 0, fmt.Errorf("device type %v requires major and minor number", devtype)

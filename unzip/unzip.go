@@ -221,6 +221,8 @@ func Info(file string) error {
 	return nil
 }
 
+// TODO this really really needs a refactor. User input doesn't work well either
+// so far unzip -l and unzip -d output asdf.zip works well
 func main() {
 	args, err := flags.Parse(&opts)
 	if flags.WroteHelp(err) {

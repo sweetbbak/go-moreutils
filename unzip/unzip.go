@@ -3,6 +3,7 @@ package main
 import (
 	"archive/zip"
 	"bufio"
+	"context"
 	"fmt"
 	"io"
 	"log"
@@ -11,20 +12,36 @@ import (
 	"strings"
 
 	"github.com/jessevdk/go-flags"
+	"github.com/ybirader/pzip"
 )
 
 var opts struct {
-	Directory string `short:"d" long:"directory" description:"directory to output unzipped files (it will be made if it doesnt exist)"`
-	Force     bool   `short:"f" long:"force" description:"force overwrite existing files if they exist"`
-	Suffix    string `short:"S" long:"suffix" description:"use SUF on compressed files"`
-	ExFile    string `short:"j" long:"just" description:"extract specified files from an archive. [-j ark.zip file1 file2]"`
-	List      bool   `short:"l" long:"list" description:"list information about the gzip archive"`
-	Keep      bool   `short:"k" long:"keep" description:"keep the source GZIP archive"`
-	Stdout    bool   `short:"c" long:"stdout" description:"print decompressed contents to stdout"`
-	Verbose   bool   `short:"v" long:"verbose" description:"print debugging information and verbose output"`
+	Directory   string `short:"d" long:"directory" description:"directory to output unzipped files (it will be made if it doesnt exist)"`
+	Force       bool   `short:"f" long:"force" description:"force overwrite existing files if they exist"`
+	Suffix      string `short:"S" long:"suffix" description:"use SUF on compressed files"`
+	ExFile      string `short:"j" long:"just" description:"extract specified files from an archive. [-j ark.zip file1 file2]"`
+	List        bool   `short:"l" long:"list" description:"list information about the gzip archive"`
+	Concurrency int    `short:"n" long:"concurrency" description:"number of concurrent workers, more is faster but uses more CPU"`
+	Keep        bool   `short:"k" long:"keep" description:"keep the source GZIP archive"`
+	Stdout      bool   `short:"c" long:"stdout" description:"print decompressed contents to stdout"`
+	Verbose     bool   `short:"v" long:"verbose" description:"print debugging information and verbose output"`
 }
 
 var Debug = func(string, ...interface{}) {}
+
+func unzip2(file, dest string) error {
+	extractor, err := pzip.NewExtractor(dest, pzip.ExtractorConcurrency(opts.Concurrency))
+	if err != nil {
+		return err
+	}
+	defer extractor.Close()
+
+	err = extractor.Extract(context.Background(), file)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func unzip(file, destination string) error {
 	r, err := zip.OpenReader(file)
@@ -184,7 +201,7 @@ func getRename(og string) (string, error) {
 func Unzip(args []string) error {
 	for _, file := range args {
 		file = os.ExpandEnv(file)
-		err := unzip(file, opts.Directory)
+		err := unzip2(file, opts.Directory)
 		if err != nil {
 			return err
 		}

@@ -6,17 +6,19 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"github.com/jessevdk/go-flags"
 	"github.com/ybirader/pzip"
 )
 
 var opts struct {
-	Outfile   string `short:"o" long:"output" description:"output zip archive to compress files to"`
-	Force     bool   `short:"f" long:"force" description:"force overwrite existing files if they exist"`
-	Recursive bool   `short:"r" long:"recursive" description:"recursively compress directories"`
-	List      bool   `short:"l" long:"list" description:"list information about the gzip archive"`
-	Verbose   bool   `short:"v" long:"verbose" description:"print debugging information and verbose output"`
+	Outfile    string `short:"o" long:"output" description:"output zip archive to compress files to"`
+	Force      bool   `short:"f" long:"force" description:"force overwrite existing files if they exist"`
+	Recursive  bool   `short:"r" long:"recursive" description:"recursively compress directories"`
+	Concurrent int    `short:"c" long:"concurrency" description:"number of workers to use, more is faster but uses more CPU."`
+	List       bool   `short:"l" long:"list" description:"list information about the gzip archive"`
+	Verbose    bool   `short:"v" long:"verbose" description:"print debugging information and verbose output"`
 }
 
 var Debug = func(string, ...interface{}) {}
@@ -47,7 +49,7 @@ func Zip(args []string) error {
 		return err
 	}
 
-	archiver, err := pzip.NewArchiver(arc)
+	archiver, err := pzip.NewArchiver(arc, pzip.ArchiverConcurrency(opts.Concurrent))
 	if err != nil {
 		return err
 	}
@@ -89,6 +91,10 @@ func printInfo(fi *zip.File) {
 	time := fi.Modified.UTC()
 	tz := time.Format("2006-01-02 15:04")
 	fmt.Printf("%-10v %-18v %-5v\n", fi.UncompressedSize64, tz, fi.Name)
+}
+
+func init() {
+	opts.Concurrent = runtime.NumCPU()
 }
 
 func main() {

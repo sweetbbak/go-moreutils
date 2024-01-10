@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/jessevdk/go-flags"
@@ -236,6 +237,10 @@ func Info(file string) error {
 
 	fmt.Printf("%v %-14v files\n", fstat.Size(), len(r.File))
 	return nil
+}
+
+func init() {
+	opts.Concurrency = runtime.NumCPU()
 }
 
 // TODO this really really needs a refactor. User input doesn't work well either

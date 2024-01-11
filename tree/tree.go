@@ -49,19 +49,60 @@ func getFileType(file string, fi os.FileInfo) string {
 	var style string
 
 	switch {
-	case contains([]string{".bat", ".btm", ".cmd", ".com", ".dll", ".exe"}, ext):
+	case contains([]string{".bat", ".btm", ".cmd", ".com", ".exe"}, ext):
 		style = Color(" "+fi.Name(), white, normal)
-	case contains([]string{".arj", ".bz2", ".deb", ".gz", ".lzh", ".rpm", ".tar", ".taz", ".tb2", ".tbz2", ".tbz", ".tgz", ".tz", ".tz2", ".z", ".zip", ".zoo"}, ext):
+	case contains([]string{".dll", ".so", ".o"}, ext):
+		style = Color(" "+fi.Name(), white, normal)
+	case contains([]string{".arj", ".bz2", ".deb", ".gz", ".lzh", ".rpm", ".br", ".7z",
+		".tar", ".taz", ".tb2", ".tbz2", ".tbz", ".tgz", ".tz", ".tz2", ".z", ".zip", ".zoo", ".xz"}, ext):
 		style = Color(" "+fi.Name(), red, normal)
 	case contains([]string{".asf", ".avi", ".bmp", ".flac", ".gif", ".jpg",
 		"jpeg", ".m2a", ".m2v", ".mov", ".mp3", ".mpeg", ".mpg", ".ogg", ".ppm",
-		".rm", ".tga", ".tif", ".wav", ".wmv",
+		".rm", ".tga", ".tif", ".wav", ".wmv", ".opus",
 		".xbm", ".xpm"}, ext):
 		style = Color(" "+fi.Name(), cyan, normal)
+	case contains([]string{".png", ".webp", ".webm", ".jpg", ".tiff", ".gif", ".jpeg", ".svg"}, ext):
+		style = Color(" "+fi.Name(), blue, normal)
+	case contains([]string{".iso", ".img"}, ext):
+		style = Color(" "+fi.Name(), red, normal)
+	case contains([]string{".bin", ".out"}, ext):
+		style = Color(" "+fi.Name(), red, normal)
+	case contains([]string{".go", ".mod", ".sum"}, ext):
+		style = Color(" "+fi.Name(), cyan, normal)
+	case contains([]string{".py"}, ext):
+		style = Color(" "+fi.Name(), yellow, normal)
+	case contains([]string{".c", ".h", ".cpp", ".cc", ".c++", ".cxx"}, ext):
+		style = Color(" "+fi.Name(), yellow, normal)
+	case contains([]string{".sh"}, ext):
+		style = Color(" "+fi.Name(), green, normal)
+	case contains([]string{".txt", ".text"}, ext):
+		style = Color(" "+fi.Name(), white, normal)
+	case contains([]string{".json", ".yml", ".yaml", ".toml"}, ext):
+		style = Color(" "+fi.Name(), green, italic)
+	case contains([]string{".conf", ".ini", ".cfg", ".nix"}, ext):
+		style = Color(" "+fi.Name(), cyan, italic)
+	case contains([]string{".lock"}, ext):
+		style = Color("  "+fi.Name(), yellow, underline)
+	case contains([]string{".md"}, ext):
+		style = Color("  "+fi.Name(), green, underline)
+	case contains([]string{".js", ".ts"}, ext):
+		style = Color("  "+fi.Name(), yellow, normal)
+	case contains([]string{".rs"}, ext):
+		style = Color(" "+fi.Name(), yellow, normal)
+	case contains([]string{"Cargo.toml"}, fi.Name()):
+		style = Color(" "+fi.Name(), yellow, underline)
+	case "LICENSE" == file:
+		style = Color(" "+fi.Name(), yellow, underline)
+	case "Makefile" == file:
+		style = Color(" "+fi.Name(), yellow, underline)
+	case "justfile" == file:
+		style = Color(" "+fi.Name(), yellow, underline)
+	case "Cargo.toml" == file:
+		style = Color(" "+fi.Name(), yellow, underline)
 	case mode&os.ModeNamedPipe != 0:
 		style = Color(" "+fi.Name(), yellow, normal)
 	case mode&os.ModeSocket != 0:
-		style = Color(" "+fi.Name(), yellow, normal)
+		style = Color(" "+fi.Name(), green, italic)
 	case mode&os.ModeDevice != 0 || mode&os.ModeCharDevice != 0:
 		style = Color(" "+fi.Name(), yellow, normal)
 	case mode&os.ModeSymlink != 0:
@@ -109,9 +150,8 @@ func getsize(size int64) string {
 func fileInfo(fi fs.FileInfo) string {
 	var info string
 	if fi.IsDir() && !opts.NoColor {
-		info = Color(fi.Name(), green, underline)
+		info = Color(" "+fi.Name(), blue, italic)
 	} else if !opts.NoColor {
-		// info = Color(fi.Name(), yellow, underline)
 		info = getFileType(fi.Name(), fi)
 	} else {
 		info = fi.Name()

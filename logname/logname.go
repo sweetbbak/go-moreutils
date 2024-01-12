@@ -21,7 +21,7 @@ func Logname(args []string) error {
 		return err
 	}
 
-	fmt.Fprintln(os.Stdout, username)
+	fmt.Fprintln(os.Stdout, username.Name)
 
 	return nil
 }

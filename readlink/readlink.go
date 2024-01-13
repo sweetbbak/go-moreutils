@@ -12,17 +12,23 @@ import (
 var opts struct {
 	Follow    bool `short:"f" long:"follow" description:"readlink and evaluate symlinks, follow to original file"`
 	NoNewLine bool `short:"n" long:"no-newline" description:"do not output a trailing new line"`
+	Zero      bool `short:"0" long:"zero" description:"separate output using NUL instead of a newline"`
 	Verbose   bool `short:"v" long:"verbose" description:"print debugging information and verbose output"`
 }
 
 var Debug = func(string, ...interface{}) {}
 
 func Readlink(args []string) error {
+	if len(args) > 1 && opts.NoNewLine {
+		log.Println("Ignoring --no-newline with multiple arguments")
+		opts.NoNewLine = false
+	}
+
 	for _, file := range args {
 		err := readlink(file)
 		if err != nil {
 			Debug("%v\n", err)
-			fmt.Println(file)
+			return err
 		}
 	}
 	return nil
@@ -32,25 +38,27 @@ func readlink(file string) error {
 	Debug("FILE: %v\n", file)
 	fi, err := os.Lstat(file)
 	if err != nil {
-		Debug("%v\n", err)
 		return err
 	}
 
 	var path string
 
 	if fi.Mode()&os.ModeSymlink != 0 {
+		// buf := make([]byte, 128)
+		// syscall.Readlink(file, buf)
+		// fmt.Println(string(buf))
+
 		path, err = os.Readlink(file)
 		if err != nil {
 			Debug("error reading symlink: %v\n", err)
 			path = fi.Name()
 		}
 	} else {
-		path = fi.Name()
+		return fmt.Errorf("Not a symlink")
 	}
 
 	if opts.Follow {
-		path, err = filepath.EvalSymlinks(file)
-		// path, err = filepath.Abs(file)
+		path, err = filepath.EvalSymlinks(path)
 		Debug("%v\n", err)
 	}
 
@@ -59,8 +67,12 @@ func readlink(file string) error {
 		delim = ""
 	}
 
+	if opts.Zero {
+		delim = "\x00"
+	}
+
 	fmt.Printf("%s%s", path, delim)
-	return err
+	return nil
 }
 
 func main() {
@@ -74,6 +86,7 @@ func main() {
 	}
 
 	if err := Readlink(args); err != nil {
-		log.Fatal(err)
+		Debug("%w\n", err)
+		os.Exit(1)
 	}
 }

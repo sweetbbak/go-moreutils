@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # build all
 
-[ ! -d "build" ] && {
+bin="_bin"
+
+[ ! -d "$bin" ] && {
     mkdir build
 }
 
@@ -23,6 +25,6 @@ whois xargs xxd yes zcat zip
 
 for i in "${exes[@]}"; do
     [ -d "${i}" ] && {
-        go build -o "build/${i}" "${i}"/*.go
+        go build -o "$bin/${i}" -ldflags="-s -w" "${i}"/*.go
     }
 done

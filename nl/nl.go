@@ -75,8 +75,13 @@ func main() {
 	opts.Separator = " "
 
 	args, err := flags.Parse(&opts)
-	if err != nil {
+	if flags.WroteHelp(err) {
 		os.Exit(0)
+		fmt.Println()
+		fmt.Println("number line [nl] adds a numbered count to lines")
+	}
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	if opts.Verbose {

@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	if err := unix.Reboot(unix.LINUX_REBOOT_CMD_POWER_OFF); err != nil {
+	if err := unix.Reboot(unix.LINUX_REBOOT_CMD_RESTART); err != nil {
 		log.Fatal(err)
 	}
 }

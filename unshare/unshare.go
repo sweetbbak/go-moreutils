@@ -19,7 +19,7 @@ var opts struct {
 }
 
 func getShell() string {
-	sh := os.ExpandEnv("$SHELL")
+	sh := os.ExpandEnv("SHELL")
 	if sh == "" {
 		sh = "/bin/bash"
 	}

@@ -49,6 +49,7 @@ func Groups(usr *user.User, args []string) error {
 	if opt.IDs {
 		return IDs(gids)
 	}
+
 	if opt.All {
 		legacyGroups(gids)
 		IDs(gids)

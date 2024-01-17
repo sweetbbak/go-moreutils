@@ -28,6 +28,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/u-root/u-root v0.11.0
 	github.com/ybirader/pzip v0.2.2
+	golang.org/x/crypto v0.14.0
 	golang.org/x/sys v0.15.0
 	golang.org/x/term v0.15.0
 	golang.org/x/tools v0.13.0
@@ -63,7 +64,6 @@ require (
 	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
-	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect

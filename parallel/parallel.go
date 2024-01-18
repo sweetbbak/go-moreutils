@@ -32,18 +32,20 @@ const (
 )
 
 func Parallel(args []string) error {
-	cmd := args[0]
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-
-	if cmd == "" {
-		return fmt.Errorf("command cannot be empty")
+	var cmd string
+	if len(args) < 1 {
+		return fmt.Errorf("example usage: parallel [CMD] < find")
+	} else {
+		cmd = args[0]
 	}
 
 	delim := newLine
 	if opts.Null {
 		delim = nullLine
 	}
+
+	ctx := context.Background()
+	ctx, cancel := context.WithCancel(ctx)
 
 	w, err := newWorkerPool(
 		ctx,
@@ -57,7 +59,7 @@ func Parallel(args []string) error {
 	)
 
 	if err != nil {
-		return err
+		log.Println(err)
 	}
 
 	c := make(chan os.Signal, 1)
@@ -211,6 +213,10 @@ func newWorkerPool(ctx context.Context, stdout, stderr io.Writer, reader io.Read
 func handleSignals(c chan os.Signal, cancel context.CancelFunc) {
 	<-c
 	fmt.Println("Got SIGINT, exiting gracefully... [Ctrl+C] to end immediately")
+	go func() {
+		cancel()
+		os.Exit(0)
+	}()
 	<-c
 	os.Exit(33)
 }

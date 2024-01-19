@@ -7,12 +7,16 @@ require (
 	github.com/alessio/shellescape v1.4.2
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
 	github.com/cenkalti/backoff/v4 v4.2.1
+	github.com/creack/pty v1.1.18
 	github.com/cyphar/filepath-securejoin v0.2.4
+	github.com/digineo/go-dhclient v1.0.2
 	github.com/diskfs/go-diskfs v1.4.0
 	github.com/dsnet/compress v0.0.2-0.20210315054119-f66993602bf5
 	github.com/dustin/go-humanize v1.0.1
 	github.com/gdamore/tcell/v2 v2.7.0
+	github.com/gliderlabs/ssh v0.3.5
 	github.com/go-git/go-git/v5 v5.10.0
+	github.com/google/gopacket v1.1.19
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/kdomanski/iso9660 v0.4.0
@@ -21,12 +25,14 @@ require (
 	github.com/mholt/archiver/v3 v3.5.1
 	github.com/nwaples/rardecode v1.1.3
 	github.com/ogier/pflag v0.0.1
+	github.com/pilebones/go-udev v0.9.0
 	github.com/pkg/term v1.2.0-beta.2
 	github.com/rck/unit v0.0.3
 	github.com/seccomp/libseccomp-golang v0.10.0
 	github.com/sergi/go-diff v1.1.0
 	github.com/spf13/pflag v1.0.5
 	github.com/u-root/u-root v0.11.0
+	github.com/vishvananda/netlink v1.1.1-0.20211118161826-650dca95af54
 	github.com/ybirader/pzip v0.2.2
 	golang.org/x/crypto v0.14.0
 	golang.org/x/sys v0.15.0
@@ -41,6 +47,7 @@ require (
 	github.com/ProtonMail/go-crypto v0.0.0-20230828082145-3c4c8a2d2371 // indirect
 	github.com/acomagu/bufpipe v1.0.4 // indirect
 	github.com/andybalholm/brotli v1.0.1 // indirect
+	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be // indirect
 	github.com/cloudflare/circl v1.3.3 // indirect
 	github.com/elliotwutingfeng/asciiset v0.0.0-20230602022725-51bbb787efab // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
@@ -55,6 +62,7 @@ require (
 	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/mdlayher/raw v0.0.0-20191009151244-50f2db8cc065 // indirect
 	github.com/pierrec/lz4/v4 v4.1.17 // indirect
 	github.com/pjbgf/sha1cd v0.3.0 // indirect
 	github.com/pkg/xattr v0.4.9 // indirect
@@ -62,6 +70,7 @@ require (
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/skeema/knownhosts v1.2.0 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
+	github.com/vishvananda/netns v0.0.0-20210104183010-2eb08e3e575f // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	golang.org/x/mod v0.12.0 // indirect

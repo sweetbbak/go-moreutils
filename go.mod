@@ -6,6 +6,7 @@ require (
 	github.com/GehirnInc/crypt v0.0.0-20230320061759-8cc1b52080c5
 	github.com/alessio/shellescape v1.4.2
 	github.com/araddon/dateparse v0.0.0-20210429162001-6b43995a97de
+	github.com/bramvdbogaerde/go-scp v1.2.1
 	github.com/cenkalti/backoff/v4 v4.2.1
 	github.com/creack/pty v1.1.18
 	github.com/cyphar/filepath-securejoin v0.2.4
@@ -33,6 +34,8 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/u-root/u-root v0.11.0
 	github.com/vishvananda/netlink v1.1.1-0.20211118161826-650dca95af54
+	github.com/wzshiming/notify v0.1.1
+	github.com/wzshiming/recorder v0.2.0
 	github.com/ybirader/pzip v0.2.2
 	golang.org/x/crypto v0.14.0
 	golang.org/x/sys v0.15.0

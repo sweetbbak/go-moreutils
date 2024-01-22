@@ -21,6 +21,7 @@ require (
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/kdomanski/iso9660 v0.4.0
+	github.com/klauspost/compress v1.17.4
 	github.com/klauspost/pgzip v1.2.6
 	github.com/mattn/go-isatty v0.0.20
 	github.com/mholt/archiver/v3 v3.5.1
@@ -33,15 +34,16 @@ require (
 	github.com/sergi/go-diff v1.1.0
 	github.com/spf13/pflag v1.0.5
 	github.com/u-root/u-root v0.11.0
+	github.com/ulikunitz/xz v0.5.11
 	github.com/vishvananda/netlink v1.1.1-0.20211118161826-650dca95af54
-	github.com/wzshiming/notify v0.1.1
-	github.com/wzshiming/recorder v0.2.0
 	github.com/ybirader/pzip v0.2.2
 	golang.org/x/crypto v0.14.0
 	golang.org/x/sys v0.15.0
 	golang.org/x/term v0.15.0
 	golang.org/x/tools v0.13.0
 	mvdan.cc/sh/v3 v3.7.0
+	pault.ag/go/modprobe v0.1.2
+	pault.ag/go/topsort v0.1.1
 )
 
 require (
@@ -62,7 +64,6 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
-	github.com/klauspost/compress v1.17.4 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
 	github.com/mdlayher/raw v0.0.0-20191009151244-50f2db8cc065 // indirect
@@ -72,7 +73,6 @@ require (
 	github.com/rivo/uniseg v0.4.3 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/skeema/knownhosts v1.2.0 // indirect
-	github.com/ulikunitz/xz v0.5.11 // indirect
 	github.com/vishvananda/netns v0.0.0-20210104183010-2eb08e3e575f // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect

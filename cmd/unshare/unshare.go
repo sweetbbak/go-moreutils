@@ -63,6 +63,11 @@ func unshare(args []string) error {
 		c.SysProcAttr.Cloneflags |= syscall.CLONE_NEWUSER
 	}
 
+	if args[0] == "chroot" {
+		syscall.Setuid(0)
+		c.SysProcAttr.Chroot = args[1]
+	}
+
 	c.Stdin = os.Stdin
 	c.Stdout = os.Stdout
 	c.Stderr = os.Stderr
@@ -83,8 +88,11 @@ func unshare(args []string) error {
 
 func main() {
 	args, err := flags.Parse(&opts)
-	if err != nil {
+	if flags.WroteHelp(err) {
 		os.Exit(0)
+	}
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	if !opts.ipc && !opts.mount && !opts.net && !opts.pid && !opts.user && !opts.uts {

@@ -8,14 +8,6 @@ import (
 	"strings"
 )
 
-// func tabby() {
-// 	writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
-// 	fmt.Fprintln(writer, "Module\tSize\tUsed\tUsed By")
-// 	fmt.Fprintf(writer, "%-19s %8s %s", name, size, used)
-// 	writer.Flush()
-
-// }
-
 func main() {
 	file, err := os.Open("/proc/modules")
 	if err != nil {
@@ -41,5 +33,4 @@ func main() {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-
 }

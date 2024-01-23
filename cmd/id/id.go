@@ -86,7 +86,7 @@ func ID(name string, current bool) error {
 				return err
 			}
 
-			fmt.Println(g)
+			fmt.Println(g.Name)
 			return nil
 		} else {
 			fmt.Println(usr.Gid)

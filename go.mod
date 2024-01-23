@@ -27,6 +27,7 @@ require (
 	github.com/mholt/archiver/v3 v3.5.1
 	github.com/nwaples/rardecode v1.1.3
 	github.com/ogier/pflag v0.0.1
+	github.com/pierrec/lz4 v2.6.1+incompatible
 	github.com/pilebones/go-udev v0.9.0
 	github.com/pkg/term v1.2.0-beta.2
 	github.com/rck/unit v0.0.3
@@ -36,6 +37,7 @@ require (
 	github.com/u-root/u-root v0.11.0
 	github.com/ulikunitz/xz v0.5.11
 	github.com/vishvananda/netlink v1.1.1-0.20211118161826-650dca95af54
+	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
 	github.com/ybirader/pzip v0.2.2
 	golang.org/x/crypto v0.14.0
 	golang.org/x/sys v0.15.0
@@ -75,7 +77,6 @@ require (
 	github.com/skeema/knownhosts v1.2.0 // indirect
 	github.com/vishvananda/netns v0.0.0-20210104183010-2eb08e3e575f // indirect
 	github.com/xanzy/ssh-agent v0.3.3 // indirect
-	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8 // indirect
 	golang.org/x/mod v0.12.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect

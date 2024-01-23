@@ -24,6 +24,12 @@ var Debug = func(string, ...interface{}) {}
 
 const modDir = "/proc/modules"
 
+// TODO: Fix kernel module dependency resolution
+// Thanks to https://terenceli.github.io/%E6%8A%80%E6%9C%AF/2018/06/02/linux-loadable-module and arch wiki
+// https://stackoverflow.com/questions/44277243/how-to-get-default-kernel-module-name-from-ko-files
+// to get a Kernel Module name, we read the ASCII bytes at offset 12 on 32bit and 24 for 64bit
+// CMD: readelf -x .gnu.linkonce.this_module test.ko
+
 func List() (map[string]bool, error) {
 	loaded := map[string]bool{}
 	f, err := os.Open(modDir)
@@ -53,7 +59,7 @@ func modinfo(args []string) error {
 	for _, mname := range args {
 		modname, err := modprobe.ResolveName(mname)
 		if err != nil {
-			// return err
+			return err
 		}
 
 		Debug("Module path resolved to: %v\n", modname)
@@ -64,7 +70,7 @@ func modinfo(args []string) error {
 		}
 
 		for _, dep := range deps {
-			fmt.Println(dep)
+			fmt.Printf("insmod %v\n", dep)
 		}
 	}
 	return nil

@@ -179,6 +179,17 @@ func verifyOptions() error {
 	if opts.User && opts.EGID || opts.User && opts.Groups {
 		return fmt.Errorf("cannot specify both group options")
 	}
+	if !opts.User && !opts.Groups && !opts.EGID {
+		if opts.Zero {
+			return fmt.Errorf("cannot print name or real IDs in default format")
+		}
+		if opts.Name {
+			return fmt.Errorf("cannot print name or real IDs in default format")
+		}
+		if opts.Real {
+			return fmt.Errorf("cannot print name or real IDs in default format")
+		}
+	}
 	return nil
 }
 

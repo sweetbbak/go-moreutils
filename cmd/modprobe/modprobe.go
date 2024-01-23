@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"runtime/pprof"
 	"strings"
 
 	"mybox/pkg/go-modprobe"
@@ -135,7 +136,36 @@ func main() {
 		Debug = log.Printf
 	}
 
+	if os.Getenv("PPROF") != "" {
+		f, err := os.Create(os.Getenv("PPROF") + "_cpu.profile")
+		if err != nil {
+			panic(err)
+		}
+
+		pprof.StartCPUProfile(f)
+
+		f2, err := os.Create(os.Getenv("PPROF") + "_mem.profile")
+		if err != nil {
+			panic(err)
+		}
+
+		pprof.StartCPUProfile(f)
+		pprof.WriteHeapProfile(f2)
+		defer pprof.StopCPUProfile()
+		f2.Close()
+	}
+
 	if err := ModProbe(args); err != nil {
 		log.Fatal(err)
+	}
+
+	if os.Getenv("PPROF") != "" {
+		f2, err := os.Create(os.Getenv("PPROF") + "_mem.profile")
+		if err != nil {
+			panic(err)
+		}
+
+		pprof.WriteHeapProfile(f2)
+		f2.Close()
 	}
 }

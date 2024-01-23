@@ -7,8 +7,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/klauspost/compress/zstd"
@@ -74,21 +76,20 @@ func generateMap() (map[string]string, error) {
 func elfMap(root string) (map[string]string, error) {
 	ret := map[string]string{}
 
-	err := filepath.Walk(
+	r := regexp.MustCompile(`\.ko`)
+
+	err := filepath.WalkDir(
 		root,
-		func(path string, info os.FileInfo, err error) error {
-			if !info.Mode().IsRegular() {
+		func(path string, info fs.DirEntry, err error) error {
+			if info.IsDir() {
 				return nil
 			}
 
-			// switch to regex probably idk
-			if !strings.Contains(path, ".ko") {
+			if !r.Match([]byte(path)) {
 				return nil
 			}
 
-			if filepath.Base(path)[0] == '.' {
-				return nil
-			}
+			// fmt.Printf("Match: %v\n", path)
 
 			fd, err := os.Open(path)
 			if err != nil {

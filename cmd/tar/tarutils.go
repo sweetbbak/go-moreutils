@@ -3,6 +3,7 @@ package main
 import (
 	"archive/tar"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -32,7 +33,7 @@ func applyToArchive(tarFile io.Reader, f func(tr *tar.Reader, hdr *tar.Header) e
 	tr := tar.NewReader(tarFile)
 	for {
 		hdr, err := tr.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {

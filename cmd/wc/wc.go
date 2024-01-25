@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -68,7 +69,7 @@ func count(in io.Reader, fname string) Count {
 	for !counted {
 		line, err := b.ReadBytes('\n')
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				counted = true
 			} else {
 				fmt.Fprintf(os.Stderr, "wc: %s: %v\n", fname, err)

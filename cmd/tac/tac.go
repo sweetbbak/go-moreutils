@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -37,7 +38,7 @@ func reverse(f *os.File) error {
 	for {
 		line, pos, err := scanner.Line()
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			return fmt.Errorf("error reading line at position %v: %v", pos, err)

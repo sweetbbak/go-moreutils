@@ -46,7 +46,7 @@ func stringsIO(br *bufio.Reader) error {
 	offset = 0
 	for {
 		b, err := br.ReadByte()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			if len(o) >= opts.MinLen {
 				if opts.Offset != "" {
 					os.Stdout.Write([]byte(offsetValue(len(o), offset)))

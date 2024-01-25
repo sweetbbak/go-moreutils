@@ -37,6 +37,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -210,7 +211,7 @@ func parallelChunkedCopy(r io.Reader, w io.Writer, inBufSize, outBufSize int64, 
 				if n > 0 {
 					readyBufs <- buf
 				}
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					return
 				}
 				if n == 0 || err != nil {

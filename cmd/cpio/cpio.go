@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -36,7 +37,7 @@ func extract(archiver cpio.RecordFormat) error {
 	}
 	for {
 		rec, err := rr.ReadRecord()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {
@@ -106,7 +107,7 @@ func list(archiver cpio.RecordFormat) error {
 	}
 	for {
 		rec, err := rr.ReadRecord()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -83,7 +84,7 @@ func Cat(args []string) error {
 				continue
 			}
 			by, err := mycopy(os.Stdout, f)
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				continue
 			} else if err != nil {
 				fmt.Fprintln(os.Stderr, err)

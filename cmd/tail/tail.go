@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -116,7 +117,7 @@ func readLinesBeginning(input io.ReadSeeker, writer io.Writer) error {
 	for {
 		n, err := io.ReadFull(input, buf)
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				break
 			}
 			if err != io.ErrUnexpectedEOF {
@@ -185,7 +186,7 @@ func followFile(file *os.File, writer io.Writer) error {
 	buf := make([]byte, blksize)
 	for {
 		n, err := file.Read(buf)
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			// without this sleep you would hogg the CPU
 			time.Sleep(50 * time.Millisecond)
 			// truncated ?
@@ -233,7 +234,7 @@ func fifoReader(pipe *os.File, writer io.Writer) error {
 	for {
 		line, err := reader.ReadBytes('\n')
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				continue
 			} else {
 				return err

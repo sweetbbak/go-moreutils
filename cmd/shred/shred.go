@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	crand "crypto/rand"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -67,7 +68,7 @@ func shredFile(f *os.File, fi fs.FileInfo, bytesWritten *int64) error {
 		r.Read(buf)
 		nn, err := wr.Write(buf)
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				continue
 			}
 			return err

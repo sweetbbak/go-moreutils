@@ -4,6 +4,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -78,7 +79,7 @@ func processes() ([]Process, error) {
 	results := make([]Process, 0, 50)
 	for {
 		names, err := d.Readdirnames(10)
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 		if err != nil {

@@ -126,7 +126,7 @@ func Cal(args []string) error {
 	case 1:
 		year, err := strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("error parsing month %v: %v", args[0], err)
+			return fmt.Errorf("error parsing month %v: %w", args[0], err)
 		}
 		for month := 1; month <= 12; month++ {
 			calendar(month, year)
@@ -135,12 +135,12 @@ func Cal(args []string) error {
 	case 2:
 		month, err := strconv.Atoi(args[0])
 		if err != nil {
-			return fmt.Errorf("error parsing month %v: %v", args[0], err)
+			return fmt.Errorf("error parsing month %v: %w", args[0], err)
 		}
 
 		year, err := strconv.Atoi(args[1])
 		if err != nil {
-			return fmt.Errorf("error parsing month %v: %v", args[0], err)
+			return fmt.Errorf("error parsing month %v: %w", args[0], err)
 		}
 		calendar(month, year)
 	}

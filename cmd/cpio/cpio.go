@@ -92,7 +92,7 @@ func create(archiver cpio.RecordFormat) error {
 	}
 
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("error reading from stdin: %v", err)
+		return fmt.Errorf("error reading from stdin: %w", err)
 	}
 	if err := cpio.WriteTrailer(rw); err != nil {
 		return fmt.Errorf("Error writing trailer record: %w", err)
@@ -121,7 +121,7 @@ func list(archiver cpio.RecordFormat) error {
 func Cpio(args []string) error {
 	archiver, err := cpio.Format(opts.Format)
 	if err != nil {
-		return fmt.Errorf("Format %v not supported: %v", opts.Format, err)
+		return fmt.Errorf("Format %v not supported: %w", opts.Format, err)
 	}
 
 	var counter []bool

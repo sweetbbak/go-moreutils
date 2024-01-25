@@ -35,7 +35,7 @@ func randomShuf(file *os.File) error {
 	Debug("length of input: %v\n", len(lines))
 
 	if err := scanner.Err(); err != nil {
-		return fmt.Errorf("error reading input: %v", err)
+		return fmt.Errorf("error reading input: %w", err)
 	}
 
 	rand.Shuffle(len(lines), func(i, j int) {

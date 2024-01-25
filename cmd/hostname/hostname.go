@@ -19,12 +19,12 @@ func Hostname(stdout io.Writer, args []string) error {
 	switch len(args) {
 	case 2:
 		if err := Sethostname(args[1]); err != nil {
-			return fmt.Errorf("could not set hostname: %v", err)
+			return fmt.Errorf("could not set hostname: %w", err)
 		}
 	case 1:
 		host, err := os.Hostname()
 		if err != nil {
-			return fmt.Errorf("could not get hostname: %v", err)
+			return fmt.Errorf("could not get hostname: %w", err)
 		}
 		_, err = fmt.Fprintln(stdout, host)
 		return err

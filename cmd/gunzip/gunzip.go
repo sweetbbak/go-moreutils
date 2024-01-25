@@ -183,10 +183,10 @@ func unzip(file *os.File) error {
 	if err == nil {
 		defer dcmp.Close()
 		if _, err := io.Copy(out, dcmp); err != nil {
-			return fmt.Errorf("gunzip: %v\n", err)
+			return fmt.Errorf("gunzip: %w\n", err)
 		}
 	} else {
-		return fmt.Errorf("gunzip: %v\n", err)
+		return fmt.Errorf("gunzip: %w\n", err)
 	}
 	return nil
 }

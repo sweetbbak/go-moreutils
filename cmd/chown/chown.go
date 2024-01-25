@@ -78,13 +78,13 @@ func lookupuid(str string) (int, error) {
 	if err != nil {
 		u, err = user.Lookup(str)
 		if err != nil {
-			return 0, fmt.Errorf("Unable to lookup provided ID: %s: %v", str, err)
+			return 0, fmt.Errorf("Unable to lookup provided ID: %s: %w", str, err)
 		}
 	}
 
 	uid, err := strconv.Atoi(u.Uid)
 	if err != nil {
-		return 0, fmt.Errorf("Unable to decode UID: %v", err)
+		return 0, fmt.Errorf("Unable to decode UID: %w", err)
 	}
 
 	return uid, nil

@@ -50,7 +50,7 @@ func List() (map[string]bool, error) {
 func rmmod(args []string) error {
 	for _, mod := range args {
 		if err := modprobe.Remove(mod); err != nil {
-			return fmt.Errorf("Error unloading module: %v", err)
+			return fmt.Errorf("Error unloading module: %w", err)
 		}
 	}
 	return nil
@@ -109,7 +109,7 @@ func ModProbe(args []string) error {
 	// we then try to load the module with optional parameters
 	if !loaded[mod] {
 		if err := modprobe.Load(mod, parameters); err != nil {
-			return fmt.Errorf("unable to load module '[%v]' with parameters [%v] %v", mod, parameters, err)
+			return fmt.Errorf("unable to load module '[%v]' with parameters [%v] %w", mod, parameters, err)
 		}
 
 		Debug("\x1b[33m[\x1b[0m[\x1b[32mINFO\x1b[33m]\x1b[0m Loaded kernel module: %v\n", mod)

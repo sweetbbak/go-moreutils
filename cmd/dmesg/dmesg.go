@@ -28,7 +28,7 @@ func dmesg() error {
 	b := make([]byte, 256*1024)
 	o, err := unix.Klogctl(level, b)
 	if err != nil {
-		return fmt.Errorf("syslog failed: %v", err)
+		return fmt.Errorf("syslog failed: %w", err)
 	}
 
 	_, err = os.Stdout.Write(b[:o])

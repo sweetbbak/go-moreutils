@@ -220,7 +220,7 @@ func Date(args []string) error {
 			fmt.Printf("%v\n", dateMap(t, z, args[0][1:]))
 		} else {
 			if err := setDate(args[0], z, rclock); err != nil {
-				return fmt.Errorf("%v: %v", args[0], err)
+				return fmt.Errorf("%v: %w", args[0], err)
 			}
 		}
 	default:

@@ -78,13 +78,13 @@ func lookupgid(str string) (int, error) {
 	if err != nil {
 		group, err = user.LookupGroup(str)
 		if err != nil {
-			return 0, fmt.Errorf("Unable to lookup provided group ID: %s: %v", str, err)
+			return 0, fmt.Errorf("Unable to lookup provided group ID: %s: %w", str, err)
 		}
 	}
 
 	gid, err := strconv.Atoi(group.Gid)
 	if err != nil {
-		return 0, fmt.Errorf("Unable to decode GID: %v", err)
+		return 0, fmt.Errorf("Unable to decode GID: %w", err)
 	}
 
 	return gid, nil

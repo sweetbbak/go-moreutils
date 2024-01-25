@@ -47,7 +47,7 @@ func nl(file *os.File, start int, width int, sep string) (int, error) {
 func NumberLines(args []string) error {
 	if len(args) == 0 {
 		if _, err := nl(os.Stdin, 1, opts.Width, opts.Separator); err != nil {
-			return fmt.Errorf("error processing input: %v", err)
+			return fmt.Errorf("error processing input: %w", err)
 		}
 		return nil
 	}
@@ -63,7 +63,7 @@ func NumberLines(args []string) error {
 
 		n, err := nl(f, start, opts.Width, opts.Separator)
 		if err != nil {
-			return fmt.Errorf("error processing input: %v", err)
+			return fmt.Errorf("error processing input: %w", err)
 		}
 		start = n
 	}

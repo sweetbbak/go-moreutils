@@ -42,7 +42,7 @@ func makeem(ff filesystem.Type, args []string) error {
 
 	d, err := diskfs.Open(args[0])
 	if err != nil {
-		return fmt.Errorf("error opening disk %s: %v", args[0], err)
+		return fmt.Errorf("error opening disk %s: %w", args[0], err)
 	}
 
 	fspec.FSType = filesystem.TypeFat32

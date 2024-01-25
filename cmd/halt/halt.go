@@ -52,7 +52,7 @@ func stopPID1() error {
 	}
 
 	if err := process.Signal(syscall.SIGUSR1); err != nil {
-		return fmt.Errorf("could not send signal SIGUSR1 to process PID 1: %v", err)
+		return fmt.Errorf("could not send signal SIGUSR1 to process PID 1: %w", err)
 	}
 	return nil
 }

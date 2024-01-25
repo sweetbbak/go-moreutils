@@ -105,12 +105,12 @@ func getCommFD() (int, error) {
 
 	cfd, err := strconv.Atoi(commfd)
 	if err != nil {
-		return -1, fmt.Errorf("%s: %v", CommFD, err)
+		return -1, fmt.Errorf("%s: %w", CommFD, err)
 	}
 	Debug("CFD is %v", cfd)
 	var st unix.Stat_t
 	if err := unix.Fstat(cfd, &st); err != nil {
-		return -1, fmt.Errorf("_FUSE_COMMFD: %d: %v", cfd, err)
+		return -1, fmt.Errorf("_FUSE_COMMFD: %d: %w", cfd, err)
 	}
 	Debug("cfd stat is %v", st)
 
@@ -136,13 +136,13 @@ func doMount(fd int) error {
 func returnResult(cfd, ffd int, e error) error {
 	if e != nil {
 		if err := unix.Shutdown(cfd, unix.SHUT_RDWR); err != nil {
-			return fmt.Errorf("shutting down after failed mount with %v: %v", e, err)
+			return fmt.Errorf("shutting down after failed mount with %v: %w", e, err)
 		}
 		return e
 	}
 	oob := unix.UnixRights(int(ffd))
 	if err := unix.Sendmsg(cfd, []byte(""), oob, nil, 0); err != nil {
-		return fmt.Errorf("%s: %d: %v", CommFD, cfd, err)
+		return fmt.Errorf("%s: %d: %w", CommFD, cfd, err)
 	}
 	return nil
 }

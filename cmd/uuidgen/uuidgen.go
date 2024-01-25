@@ -40,7 +40,7 @@ func (u *UUID) String() string {
 func UUIDFromKernel() error {
 	file, err := os.Open("/proc/sys/kernel/random/uuid")
 	if err != nil {
-		return fmt.Errorf("Error getting kernel uuid: %v", err)
+		return fmt.Errorf("Error getting kernel uuid: %w", err)
 	}
 	defer file.Close()
 

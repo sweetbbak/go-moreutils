@@ -67,7 +67,7 @@ func WatchDog(args []string) error {
 
 		d, err := watchdogd.NewClient()
 		if err != nil {
-			return fmt.Errorf("could not dial watchdog daemon: %v", err)
+			return fmt.Errorf("could not dial watchdog daemon: %w", err)
 		}
 		f, ok := map[string]func() error{
 			"stop":     d.Stop,

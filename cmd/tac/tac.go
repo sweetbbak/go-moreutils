@@ -41,7 +41,7 @@ func reverse(f *os.File) error {
 			if errors.Is(err, io.EOF) {
 				break
 			}
-			return fmt.Errorf("error reading line at position %v: %v", pos, err)
+			return fmt.Errorf("error reading line at position %v: %w", pos, err)
 		}
 		fmt.Println(line)
 	}

@@ -76,7 +76,7 @@ func KillProcess(args []string) error {
 		return nil
 	}
 	if err := kill(s, pids...); err != nil {
-		return fmt.Errorf("some processes couldnt be killed: %v", err)
+		return fmt.Errorf("some processes couldnt be killed: %v", err) // fix this
 	}
 	return nil
 }

@@ -56,7 +56,7 @@ func listArchive(tarfile io.Reader) error {
 func SafeFilepathJoin(path1, path2 string) (string, error) {
 	relPath, err := filepath.Rel(".", path2)
 	if err != nil || strings.HasPrefix(relPath, "..") {
-		return "", fmt.Errorf("(zipslip) filepath is unsafe %q: %v", path2, err)
+		return "", fmt.Errorf("(zipslip) filepath is unsafe %q: %w", path2, err)
 	}
 	if path1 == "" {
 		path1 = "."
@@ -76,10 +76,10 @@ func extractDir(tarfile io.Reader, dir string, opts *TarOpts) error {
 	fi, err := os.Stat(dir)
 	if os.IsNotExist(err) {
 		if err := os.Mkdir(dir, os.ModePerm); err != nil {
-			return fmt.Errorf("could not create directory %s: %v", dir, err)
+			return fmt.Errorf("could not create directory %s: %w", dir, err)
 		}
 	} else if err != nil || !fi.IsDir() {
-		return fmt.Errorf("could not stat directory %s: %v", dir, err)
+		return fmt.Errorf("could not stat directory %s: %w", dir, err)
 	}
 
 	return applyToArchive(tarfile, func(tr *tar.Reader, hdr *tar.Header) error {
@@ -126,7 +126,7 @@ func createFileInRoot(hdr *tar.Header, r io.Reader, rootDir string) error {
 	}
 
 	if err := os.Chmod(path, fi.Mode()&os.ModePerm); err != nil {
-		return fmt.Errorf("error setting mode %#o on %v: %v", fi.Mode()&os.ModePerm, path, err)
+		return fmt.Errorf("error setting mode %#o on %v: %w", fi.Mode()&os.ModePerm, path, err)
 	}
 	// add ownership
 	return nil

@@ -15,11 +15,11 @@ func Sethostname(name string) error {
 
 func userSetHostname(hostname string) error {
 	if err := os.WriteFile("/etc/hostname", []byte(hostname), 0o644); err != nil {
-		return fmt.Errorf("error writing hostname file: %v", err)
+		return fmt.Errorf("error writing hostname file: %w", err)
 	}
 
 	if err := Sethostname(hostname); err != nil {
-		return fmt.Errorf("error setting hostname: %v", err)
+		return fmt.Errorf("error setting hostname: %w", err)
 	}
 	return nil
 }

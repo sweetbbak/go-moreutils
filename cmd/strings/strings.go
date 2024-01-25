@@ -94,12 +94,12 @@ func stringsFile(file string) error {
 
 func Strings(args []string) error {
 	if opts.MinLen < 1 {
-		return fmt.Errorf("%v: %v", errInvalidRange, opts.MinLen)
+		return fmt.Errorf("%w: %v", errInvalidRange, opts.MinLen)
 	}
 
 	if opts.Offset != "" {
 		if opts.Offset != "d" && opts.Offset != "o" && opts.Offset != "x" {
-			return fmt.Errorf("%v: %v", errInvalidArg, opts.Offset)
+			return fmt.Errorf("%w: %v", errInvalidArg, opts.Offset)
 		}
 	}
 

@@ -38,7 +38,7 @@ func Getty(args []string) error {
 
 	ttys, err := termios.NewTTYS(port)
 	if err != nil {
-		return fmt.Errorf("Error opening port %s: %v", port, err)
+		return fmt.Errorf("Error opening port %s: %w", port, err)
 	}
 
 	if _, err := ttys.Serial(baud); err != nil {
@@ -48,7 +48,7 @@ func Getty(args []string) error {
 	if term != "" {
 		err = os.Setenv("TERM", term)
 		if err != nil {
-			log.Printf("error setting TERM environment variable: TERM=%s: %s", term, err)
+			log.Printf("error setting TERM environment variable: TERM=%s: %v", term, err)
 		}
 	}
 
@@ -66,7 +66,7 @@ func Getty(args []string) error {
 	}
 
 	if err := cmd.Process.Release(); err != nil {
-		log.Printf("Error releasing process: %s", err)
+		log.Printf("Error releasing process: %v", err)
 	}
 
 	return nil

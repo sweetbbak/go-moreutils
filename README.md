@@ -53,16 +53,36 @@ export GOARCH=amd64
 ./build.sh
 ```
 
+## Stats
+```
+───────────────────────────────────────────────────────────────────────────────
+Language                 Files     Lines   Blanks  Comments     Code Complexity
+───────────────────────────────────────────────────────────────────────────────
+Go                         396     50126     6587      3494    40045      10171
+Plain Text                 202       496      202         0      294          0
+Markdown                    17       387       61         0      326          0
+Shell                        8       144       35        30       79         19
+License                      2        40        7         0       33          0
+gitignore                    2        21        0         0       21          0
+───────────────────────────────────────────────────────────────────────────────
+Total                      627     51214     6892      3524    40798      10190
+───────────────────────────────────────────────────────────────────────────────
+Estimated Cost to Develop (organic) $1,326,679
+Estimated Schedule Effort (organic) 15.31 months
+Estimated People Required (organic) 7.70
+───────────────────────────────────────────────────────────────────────────────
+Processed 1235749 bytes, 1.236 megabytes (SI)
+───────────────────────────────────────────────────────────────────────────────
+```
+
 ## Credits
-Huge note on the `init` command:
+thanks to James Mills's project `gonix` that is under MIT license for a good example of an `init`
+command and some of the libs implemented in the init.
 
-I rewrote a lot of things but I yoinked the know-how and go-packages from James Mills's project `gonix`
-that is under MIT license. Ive modified things here and there but I have to give this guy huge props
-for a decently large chunk of code and for showing me how this works in Go.
-
-I've also used the u-root implementation as reference for many commands. Outside of that, I've done my best to use all materials
-as a tool for learning how something is done, and done my best to implement a version of my own to the best of my ability.
-However it would have not been possible without the work of many many others.
+thanks to `u-root` for having one of the best implementations of Go linux user-land. Ive referenced
+many of their tools and am currently using a few of their libs as well where re-writing them would
+have been a monumental task (ie proper support for PCIE, block devices, network stacks etc...) at
+some point I'd like to entirely re-write as much of these libs as I can.
 
 Repositories used and referenced:
 - ![gonix](https://git.mills.io/prologic/gonix.git) MIT License
@@ -74,3 +94,4 @@ Repositories used and referenced:
 Please note that none of these projects endorse or promote any of this work. I am greatly thankful to them
 for all of their work and for making it open-source and allowing permissive usage of their work. As well as Go
 for providing a very robust standard lib and great documentation.
+

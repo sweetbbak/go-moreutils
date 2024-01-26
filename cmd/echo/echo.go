@@ -85,9 +85,6 @@ func replaceColor(line string) string {
 	if r.Match([]byte(line)) {
 		line = r.ReplaceAllStringFunc(line, func(line string) string {
 			str := line
-			// str = strings.ReplaceAll(str, "{clr}", "\x1b[0m")
-			// str = strings.ReplaceAll(str, "{clr}", "")
-			// str = strings.ReplaceAll(str, "{clear}", "")
 			str = strings.ReplaceAll(str, "{", "")
 			str = strings.ReplaceAll(str, "}", "")
 

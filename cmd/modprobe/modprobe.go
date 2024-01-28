@@ -13,11 +13,17 @@ import (
 )
 
 var opts struct {
-	All     bool `short:"a" long:"all" description:"Load multiple kernel modules"`
-	Remove  bool `short:"r" long:"remove" description:"Remove a Kernel module"`
-	List    bool `short:"l" long:"list" description:"Load multiple kernel modules"`
-	Deps    bool `short:"d" long:"show-depends" description:"print dependencies of a module, takes a path to a .ko file"`
-	Verbose bool `short:"v" long:"verbose" description:"print debugging information and verbose output"`
+	All           bool   `short:"a" long:"all" description:"Load multiple kernel modules"`
+	Remove        bool   `short:"r" long:"remove" description:"Remove a Kernel module"`
+	List          bool   `short:"l" long:"list" description:"Load multiple kernel modules"`
+	Deps          bool   `short:"d" long:"show-depends" description:"print dependencies of a module, takes a path to a .ko file"`
+	DryRun        bool   `short:"D" long:"dry-run" description:"do everything except load or unload modules"`
+	IgnoreBuiltin bool   `short:"I" long:"ignore-builtin" description:"ignore builtin modules"`
+	IgnoreAlias   bool   `short:"A" long:"ignore-alias" description:"ignore module aliases"`
+	IgnoreStatus  bool   `short:"S" long:"ignore-status" description:"ignore the status of a module (loading|unloading|live|inUse|unloaded)"`
+	RootDir       string `short:"R" long:"root" description:"root directory, sets dir as root directory for modules. defaults (/lib/modules)"`
+	Config        string `short:"c" long:"config" description:"config file, sets FILE as config file for modules. defaults (/etc/modprobe.conf)"`
+	Verbose       bool   `short:"v" long:"verbose" description:"print debugging information and verbose output"`
 }
 
 var Debug = func(string, ...interface{}) {}
@@ -74,6 +80,34 @@ func ModProbe(args []string) error {
 	loaded, err := List()
 	if err != nil {
 		return err
+	}
+
+	if opts.DryRun {
+		kmod.SetDryrun()
+	}
+
+	if opts.IgnoreBuiltin {
+		kmod.SetIgnoreBuiltin()
+	}
+
+	if opts.IgnoreAlias {
+		kmod.SetIgnoreAlias()
+	}
+
+	if opts.IgnoreStatus {
+		kmod.SetIgnoreStatus()
+	}
+
+	if opts.Verbose {
+		kmod.SetVerbose()
+	}
+
+	if opts.RootDir != "" {
+		kmod.SetRootDir(opts.RootDir)
+	}
+
+	if opts.Config != "" {
+		kmod.SetConfigFile(opts.Config)
 	}
 
 	if opts.List {

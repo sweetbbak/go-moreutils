@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"github.com/jessevdk/go-flags"
-	"mybox/pkg/kmod"
+	"github.com/pmorjan/kmod"
 )
 
 var opts struct {
@@ -76,38 +76,42 @@ func modinfo(args []string, k *kmod.Kmod) error {
 }
 
 func ModProbe(args []string) error {
-	k, err := kmod.New(kmod.SetInitFunc(modInit))
-	loaded, err := List()
-	if err != nil {
-		return err
-	}
+	options := []kmod.Option{}
 
 	if opts.DryRun {
-		kmod.SetDryrun()
+		options = append(options, kmod.SetDryrun())
 	}
 
 	if opts.IgnoreBuiltin {
-		kmod.SetIgnoreBuiltin()
+		options = append(options, kmod.SetIgnoreBuiltin())
 	}
 
 	if opts.IgnoreAlias {
-		kmod.SetIgnoreAlias()
+		options = append(options, kmod.SetIgnoreAlias())
 	}
 
 	if opts.IgnoreStatus {
-		kmod.SetIgnoreStatus()
+		options = append(options, kmod.SetIgnoreStatus())
 	}
 
 	if opts.Verbose {
-		kmod.SetVerbose()
+		options = append(options, kmod.SetVerbose())
 	}
 
 	if opts.RootDir != "" {
-		kmod.SetRootDir(opts.RootDir)
+		options = append(options, kmod.SetRootDir(opts.RootDir))
 	}
 
 	if opts.Config != "" {
-		kmod.SetConfigFile(opts.Config)
+		options = append(options, kmod.SetConfigFile(opts.Config))
+	}
+
+	options = append(options, kmod.SetInitFunc(modInit))
+
+	k, err := kmod.New(options...)
+	loaded, err := List()
+	if err != nil {
+		return err
 	}
 
 	if opts.List {
@@ -142,7 +146,7 @@ func ModProbe(args []string) error {
 		return fmt.Errorf("module is already loaded")
 	}
 
-	Debug("\x1b[33m[\x1b[0m[\x1b[32mINFO\x1b[33m]\x1b[0m Loaded kernel module: %v\n", mod)
+	Debug("\x1b[33m[\x1b[0m\x1b[32mINFO\x1b[33m]\x1b[0m Loaded kernel module: %v\n", mod)
 
 	return nil
 }

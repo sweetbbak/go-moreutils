@@ -32,6 +32,7 @@ require (
 	github.com/pierrec/lz4 v2.6.1+incompatible
 	github.com/pilebones/go-udev v0.9.0
 	github.com/pkg/term v1.2.0-beta.2
+	github.com/pmorjan/kmod v1.1.1
 	github.com/rck/unit v0.0.3
 	github.com/rekby/gpt v0.0.0-20200219180433-a930afbc6edc
 	github.com/seccomp/libseccomp-golang v0.10.0
@@ -43,7 +44,7 @@ require (
 	github.com/xi2/xz v0.0.0-20171230120015-48954b6210f8
 	github.com/ybirader/pzip v0.2.2
 	golang.org/x/crypto v0.17.0
-	golang.org/x/sys v0.15.0
+	golang.org/x/sys v0.16.0
 	golang.org/x/term v0.15.0
 	golang.org/x/tools v0.16.1
 	mvdan.cc/sh/v3 v3.7.0

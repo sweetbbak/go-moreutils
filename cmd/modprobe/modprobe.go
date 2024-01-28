@@ -8,9 +8,8 @@ import (
 	"runtime/pprof"
 	"strings"
 
-	"mybox/pkg/go-modprobe"
-
 	"github.com/jessevdk/go-flags"
+	"mybox/pkg/kmod"
 )
 
 var opts struct {
@@ -47,37 +46,31 @@ func List() (map[string]bool, error) {
 	return loaded, err
 }
 
-func rmmod(args []string) error {
+func rmmod(args []string, k *kmod.Kmod) error {
 	for _, mod := range args {
-		if err := modprobe.Remove(mod); err != nil {
+		if err := k.Unload(mod); err != nil {
 			return fmt.Errorf("Error unloading module: %w", err)
 		}
 	}
 	return nil
 }
 
-func modinfo(args []string) error {
-	for _, mname := range args {
-		modname, err := modprobe.ResolveName(mname)
-		if err != nil {
-			return err
-		}
-
-		Debug("Module path resolved to: %v\n", modname)
-
-		deps, err := modprobe.Dependencies(modname)
+func modinfo(args []string, k *kmod.Kmod) error {
+	for _, mod := range args {
+		deps, err := k.Dependencies(mod)
 		if err != nil {
 			return err
 		}
 
 		for _, dep := range deps {
-			fmt.Printf("insmod %v\n", dep)
+			fmt.Printf("insmod %s\n", dep)
 		}
 	}
 	return nil
 }
 
 func ModProbe(args []string) error {
+	k, err := kmod.New(kmod.SetInitFunc(modInit))
 	loaded, err := List()
 	if err != nil {
 		return err
@@ -91,11 +84,11 @@ func ModProbe(args []string) error {
 	}
 
 	if opts.Deps {
-		return modinfo(args)
+		return modinfo(args, k)
 	}
 
 	if opts.Remove {
-		return rmmod(args)
+		return rmmod(args, k)
 	}
 
 	if len(args) < 1 {
@@ -108,19 +101,19 @@ func ModProbe(args []string) error {
 	// if the module is not already found in /proc/modules (indicating it is alread loaded)
 	// we then try to load the module with optional parameters
 	if !loaded[mod] {
-		if err := modprobe.Load(mod, parameters); err != nil {
+		if err := k.Load(mod, parameters, 0); err != nil {
 			return fmt.Errorf("unable to load module '[%v]' with parameters [%v] %w", mod, parameters, err)
 		}
-
-		Debug("\x1b[33m[\x1b[0m[\x1b[32mINFO\x1b[33m]\x1b[0m Loaded kernel module: %v\n", mod)
 	} else {
 		return fmt.Errorf("module is already loaded")
 	}
 
+	Debug("\x1b[33m[\x1b[0m[\x1b[32mINFO\x1b[33m]\x1b[0m Loaded kernel module: %v\n", mod)
+
 	return nil
 }
 
-const usage = `modprobe <module_name> [OPTIONAL] PARAMETERS=VALUE`
+const usage = `modprobe <module_name> [OPTIONAL_PARAMETERS] options PARAMETERS=VALUE a,b,c,d`
 
 func main() {
 	args, err := flags.Parse(&opts)

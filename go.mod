@@ -21,6 +21,7 @@ require (
 	github.com/google/gopacket v1.1.19
 	github.com/hugelgupf/vmtest v0.0.0-20240124044647-150d99bfa80e
 	github.com/icza/backscanner v0.0.0-20230330133933-bf6beb754c70
+	github.com/insomniacslk/dhcp v0.0.0-20231206064809-8c70d406f6d2
 	github.com/jessevdk/go-flags v1.5.0
 	github.com/kdomanski/iso9660 v0.4.0
 	github.com/klauspost/compress v1.17.4
@@ -72,7 +73,6 @@ require (
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
-	github.com/insomniacslk/dhcp v0.0.0-20231206064809-8c70d406f6d2 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
 	github.com/josharian/native v1.1.0 // indirect
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
